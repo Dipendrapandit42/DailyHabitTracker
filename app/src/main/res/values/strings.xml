@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Daily Habit Tracker</string>
+    <string name="no_habits">No habits added yet</string>
+    <string name="current_streak">🔥 Current Streak: %1$d Days</string>
+    <string name="habit_format">• %1$s\n  🔥 Streak: %2$d days</string>
+    <string name="enter_habit_name">Please enter a habit name</string>
+    <string name="habit_added">Habit added successfully!</string>
+</resources>
