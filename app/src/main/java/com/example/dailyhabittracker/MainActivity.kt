@@ -6,13 +6,18 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var btnAddHabit: Button
     private lateinit var tvStreak: TextView
-    private lateinit var tvHabits: TextView
+    private lateinit var recyclerViewHabits: RecyclerView
+    private lateinit var habitAdapter: HabitAdapter
 
     private lateinit var database: HabitDatabase
 
@@ -22,13 +27,19 @@ class MainActivity : AppCompatActivity() {
 
         btnAddHabit = findViewById(R.id.btnAddHabit)
         tvStreak = findViewById(R.id.tvStreak)
-        tvHabits = findViewById(R.id.tvHabits)
+        recyclerViewHabits = findViewById(R.id.recyclerViewHabits)
 
         database = HabitDatabase.getDatabase(this)
 
+        habitAdapter = HabitAdapter(emptyList()) { habit ->
+            completeHabit(habit)
+        }
+
+        recyclerViewHabits.layoutManager = LinearLayoutManager(this)
+        recyclerViewHabits.adapter = habitAdapter
+
         btnAddHabit.setOnClickListener {
-            val intent = Intent(this, AddHabitActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AddHabitActivity::class.java))
         }
 
         loadHabits()
@@ -41,27 +52,50 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadHabits() {
         lifecycleScope.launch {
-
             val habits = database.habitDao().getAllHabits()
 
             runOnUiThread {
+                habitAdapter.updateHabits(habits)
 
-                if (habits.isEmpty()) {
+                val maxStreak = if (habits.isEmpty()) 0
+                else habits.maxOf { it.currentStreak }
 
-                    tvHabits.text = getString(R.string.no_habits)
-                    tvStreak.text = getString(R.string.current_streak, 0)
+                tvStreak.text = "🔥 Current Streak: $maxStreak Days"
+            }
+        }
+    }
 
-                } else {
+    private fun completeHabit(habit: Habit) {
+        lifecycleScope.launch {
 
-                    tvHabits.text = habits.joinToString("\n\n") {
-                        getString(R.string.habit_format, it.name, it.currentStreak)
-                    }
+            val today = LocalDate.now()
+            val lastDate = habit.lastCompletedDate
 
-                    val maxStreak = habits.maxOf { it.currentStreak }
+            var newStreak = habit.currentStreak
 
-                    tvStreak.text = getString(R.string.current_streak, maxStreak)
+            if (lastDate == null) {
+                newStreak = 1
+            } else {
+                val previousDate = LocalDate.parse(lastDate)
+                val daysMissed = ChronoUnit.DAYS.between(previousDate, today) - 1
+
+                newStreak = when {
+                    daysMissed <= 0 -> habit.currentStreak
+                    daysMissed <= 3 -> habit.currentStreak + 1
+                    else -> 1
                 }
             }
+
+            val updatedHabit = habit.copy(
+                currentStreak = newStreak,
+                lastCompletedDate = today.toString(),
+                missedDays = 0,
+                isCompletedToday = true
+            )
+
+            database.habitDao().updateHabit(updatedHabit)
+
+            loadHabits()
         }
     }
 }

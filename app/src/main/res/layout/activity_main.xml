@@ -32,11 +32,10 @@
         android:text="+ Add Habit"
         android:layout_marginBottom="20dp"/>
 
-    <TextView
-        android:id="@+id/tvHabits"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHabits"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="No habits added yet"
-        android:textSize="18sp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
 </LinearLayout>
