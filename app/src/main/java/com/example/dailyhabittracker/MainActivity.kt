@@ -3,7 +3,10 @@ package com.example.dailyhabittracker
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,15 +34,31 @@ class MainActivity : AppCompatActivity() {
 
         database = HabitDatabase.getDatabase(this)
 
-        habitAdapter = HabitAdapter(emptyList()) { habit ->
-            completeHabit(habit)
-        }
+        habitAdapter = HabitAdapter(
+            emptyList(),
 
-        recyclerViewHabits.layoutManager = LinearLayoutManager(this)
+            onCompleteClick = { habit ->
+                completeHabit(habit)
+            },
+
+            onEditClick = { habit ->
+                editHabit(habit)
+            },
+
+            onDeleteClick = { habit ->
+                deleteHabit(habit)
+            }
+        )
+
+        recyclerViewHabits.layoutManager =
+            LinearLayoutManager(this)
+
         recyclerViewHabits.adapter = habitAdapter
 
         btnAddHabit.setOnClickListener {
-            startActivity(Intent(this, AddHabitActivity::class.java))
+            startActivity(
+                Intent(this, AddHabitActivity::class.java)
+            )
         }
 
         loadHabits()
@@ -51,51 +70,222 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadHabits() {
+
         lifecycleScope.launch {
-            val habits = database.habitDao().getAllHabits()
+
+            val habits =
+                database.habitDao().getAllHabits()
+
+            val today = LocalDate.now()
+
+            val updatedHabits = habits.map { habit ->
+
+                if (habit.lastCompletedDate != null) {
+
+                    val lastDate =
+                        LocalDate.parse(habit.lastCompletedDate)
+
+                    val daysSinceLastCompletion =
+                        ChronoUnit.DAYS.between(
+                            lastDate,
+                            today
+                        ).toInt()
+
+                    val missedDays =
+                        if (daysSinceLastCompletion > 0) {
+                            daysSinceLastCompletion - 1
+                        } else {
+                            0
+                        }
+
+                    if (missedDays > 3) {
+
+                        habit.copy(
+                            currentStreak = 0,
+                            missedDays = missedDays,
+                            isCompletedToday = false
+                        )
+
+                    } else {
+
+                        habit.copy(
+                            missedDays = missedDays,
+                            isCompletedToday =
+                                habit.lastCompletedDate ==
+                                        today.toString()
+                        )
+                    }
+
+                } else {
+
+                    habit
+                }
+            }
+
+            updatedHabits.forEach { habit ->
+
+                database.habitDao()
+                    .updateHabit(habit)
+            }
 
             runOnUiThread {
-                habitAdapter.updateHabits(habits)
 
-                val maxStreak = if (habits.isEmpty()) 0
-                else habits.maxOf { it.currentStreak }
+                habitAdapter.updateHabits(
+                    updatedHabits
+                )
 
-                tvStreak.text = "🔥 Current Streak: $maxStreak Days"
+                val maxStreak =
+                    if (updatedHabits.isEmpty()) {
+                        0
+                    } else {
+                        updatedHabits.maxOf {
+                            it.currentStreak
+                        }
+                    }
+
+                tvStreak.text =
+                    "🔥 Current Streak: $maxStreak Days"
             }
         }
     }
 
     private fun completeHabit(habit: Habit) {
+
         lifecycleScope.launch {
 
             val today = LocalDate.now()
-            val lastDate = habit.lastCompletedDate
 
-            var newStreak = habit.currentStreak
+            var newStreak =
+                habit.currentStreak
 
-            if (lastDate == null) {
+            if (habit.lastCompletedDate == null) {
+
                 newStreak = 1
+
             } else {
-                val previousDate = LocalDate.parse(lastDate)
-                val daysMissed = ChronoUnit.DAYS.between(previousDate, today) - 1
+
+                val lastDate =
+                    LocalDate.parse(
+                        habit.lastCompletedDate
+                    )
+
+                val daysSinceLastCompletion =
+                    ChronoUnit.DAYS.between(
+                        lastDate,
+                        today
+                    ).toInt()
+
+                val missedDays =
+                    if (daysSinceLastCompletion > 0) {
+                        daysSinceLastCompletion - 1
+                    } else {
+                        0
+                    }
 
                 newStreak = when {
-                    daysMissed <= 0 -> habit.currentStreak
-                    daysMissed <= 3 -> habit.currentStreak + 1
-                    else -> 1
+
+                    daysSinceLastCompletion == 0 ->
+                        habit.currentStreak
+
+                    missedDays in 1..3 ->
+                        habit.currentStreak + 1
+
+                    missedDays > 3 ->
+                        1
+
+                    else ->
+                        habit.currentStreak
                 }
             }
 
-            val updatedHabit = habit.copy(
-                currentStreak = newStreak,
-                lastCompletedDate = today.toString(),
-                missedDays = 0,
-                isCompletedToday = true
-            )
+            val updatedHabit =
+                habit.copy(
+                    currentStreak = newStreak,
+                    lastCompletedDate = today.toString(),
+                    missedDays = 0,
+                    isCompletedToday = true
+                )
 
-            database.habitDao().updateHabit(updatedHabit)
+            database.habitDao()
+                .updateHabit(updatedHabit)
 
             loadHabits()
         }
+    }
+
+    private fun editHabit(habit: Habit) {
+
+        val editText = EditText(this)
+
+        editText.setText(habit.name)
+
+        editText.setPadding(
+            40,
+            20,
+            40,
+            20
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle("Edit Habit")
+            .setView(editText)
+            .setPositiveButton("Save") { _, _ ->
+
+                val newName =
+                    editText.text.toString().trim()
+
+                if (newName.isEmpty()) {
+
+                    Toast.makeText(
+                        this,
+                        "Habit name cannot be empty",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+
+                    lifecycleScope.launch {
+
+                        val updatedHabit =
+                            habit.copy(
+                                name = newName
+                            )
+
+                        database.habitDao()
+                            .updateHabit(updatedHabit)
+
+                        loadHabits()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteHabit(habit: Habit) {
+
+        AlertDialog.Builder(this)
+            .setTitle("Delete Habit")
+            .setMessage(
+                "Are you sure you want to delete \"${habit.name}\"?"
+            )
+            .setPositiveButton("Delete") { _, _ ->
+
+                lifecycleScope.launch {
+
+                    database.habitDao()
+                        .deleteHabit(habit)
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Habit deleted",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    loadHabits()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 }
