@@ -1,6 +1,8 @@
 package com.example.dailyhabittracker
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -8,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +21,7 @@ import java.time.temporal.ChronoUnit
 class MainActivity : AppCompatActivity() {
 
     private lateinit var btnAddHabit: Button
+    private lateinit var btnStatistics: Button
     private lateinit var tvStreak: TextView
     private lateinit var recyclerViewHabits: RecyclerView
     private lateinit var habitAdapter: HabitAdapter
@@ -29,10 +33,29 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btnAddHabit = findViewById(R.id.btnAddHabit)
+        btnStatistics = findViewById(R.id.btnStatistics)
         tvStreak = findViewById(R.id.tvStreak)
         recyclerViewHabits = findViewById(R.id.recyclerViewHabits)
 
         database = HabitDatabase.getDatabase(this)
+
+        // Schedule daily notifications at 5:00 AM and 4:00 PM
+        NotificationScheduler.scheduleNotifications(this)
+
+        // Request notification permission for Android 13+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    101
+                )
+            }
+        }
 
         habitAdapter = HabitAdapter(
             emptyList(),
@@ -58,6 +81,12 @@ class MainActivity : AppCompatActivity() {
         btnAddHabit.setOnClickListener {
             startActivity(
                 Intent(this, AddHabitActivity::class.java)
+            )
+        }
+
+        btnStatistics.setOnClickListener {
+            startActivity(
+                Intent(this, StatisticsActivity::class.java)
             )
         }
 

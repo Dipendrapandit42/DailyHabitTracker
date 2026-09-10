@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -14,7 +15,8 @@ class HabitAdapter(
     private val onDeleteClick: (Habit) -> Unit
 ) : RecyclerView.Adapter<HabitAdapter.HabitViewHolder>() {
 
-    class HabitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class HabitViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
 
         val tvHabitName: TextView =
             itemView.findViewById(R.id.tvHabitName)
@@ -25,14 +27,11 @@ class HabitAdapter(
         val tvHabitStatus: TextView =
             itemView.findViewById(R.id.tvHabitStatus)
 
+        val tvMore: TextView =
+            itemView.findViewById(R.id.tvMore)
+
         val btnComplete: Button =
             itemView.findViewById(R.id.btnComplete)
-
-        val btnEdit: Button =
-            itemView.findViewById(R.id.btnEdit)
-
-        val btnDelete: Button =
-            itemView.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(
@@ -83,12 +82,36 @@ class HabitAdapter(
             }
         }
 
-        holder.btnEdit.setOnClickListener {
-            onEditClick(habit)
-        }
+        // Three-dot menu
+        holder.tvMore.setOnClickListener {
 
-        holder.btnDelete.setOnClickListener {
-            onDeleteClick(habit)
+            val popupMenu = PopupMenu(
+                holder.itemView.context,
+                holder.tvMore
+            )
+
+            popupMenu.menu.add("✏️ Edit")
+            popupMenu.menu.add("🗑️ Delete")
+
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+
+                when (menuItem.title.toString()) {
+
+                    "✏️ Edit" -> {
+                        onEditClick(habit)
+                        true
+                    }
+
+                    "🗑️ Delete" -> {
+                        onDeleteClick(habit)
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            popupMenu.show()
         }
     }
 

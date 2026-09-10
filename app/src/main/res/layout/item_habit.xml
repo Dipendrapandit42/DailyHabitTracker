@@ -8,14 +8,36 @@
     android:padding="16dp"
     android:layout_marginBottom="12dp">
 
-    <TextView
-        android:id="@+id/tvHabitName"
+    <!-- Habit Name + Three Dot Menu -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Exercise"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="6dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvHabitName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Evening exercise"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingVertical="8dp"/>
+
+        <TextView
+            android:id="@+id/tvMore"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="⋮"
+            android:textSize="28sp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="More options"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvHabitStreak"
@@ -23,6 +45,7 @@
         android:layout_height="wrap_content"
         android:text="🔥 0"
         android:textSize="17sp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"/>
 
     <TextView
@@ -37,30 +60,6 @@
         android:id="@+id/btnComplete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Complete"
-        android:layout_marginBottom="8dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnEdit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Edit"
-            android:layout_marginEnd="4dp"/>
-
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Delete"
-            android:layout_marginStart="4dp"/>
-
-    </LinearLayout>
+        android:text="Complete"/>
 
 </LinearLayout>
