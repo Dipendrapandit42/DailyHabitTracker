@@ -22,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var btnAddHabit: Button
     private lateinit var btnStatistics: Button
+    private lateinit var btnNutrition: Button
+    private lateinit var btnProfile: Button
     private lateinit var tvStreak: TextView
     private lateinit var recyclerViewHabits: RecyclerView
     private lateinit var habitAdapter: HabitAdapter
@@ -34,12 +36,14 @@ class MainActivity : AppCompatActivity() {
 
         btnAddHabit = findViewById(R.id.btnAddHabit)
         btnStatistics = findViewById(R.id.btnStatistics)
+        btnNutrition = findViewById(R.id.btnNutrition)
+        btnProfile = findViewById(R.id.btnProfile)
         tvStreak = findViewById(R.id.tvStreak)
         recyclerViewHabits = findViewById(R.id.recyclerViewHabits)
 
         database = HabitDatabase.getDatabase(this)
 
-        // Schedule daily notifications at 5:00 AM and 4:00 PM
+        // Schedule daily notifications at 5:00 AM and 5:00 PM
         NotificationScheduler.scheduleNotifications(this)
 
         // Request notification permission for Android 13+
@@ -78,15 +82,47 @@ class MainActivity : AppCompatActivity() {
 
         recyclerViewHabits.adapter = habitAdapter
 
+        // Add Habit
         btnAddHabit.setOnClickListener {
+
             startActivity(
-                Intent(this, AddHabitActivity::class.java)
+                Intent(
+                    this,
+                    AddHabitActivity::class.java
+                )
             )
         }
 
+        // Statistics
         btnStatistics.setOnClickListener {
+
             startActivity(
-                Intent(this, StatisticsActivity::class.java)
+                Intent(
+                    this,
+                    StatisticsActivity::class.java
+                )
+            )
+        }
+
+        // Nutrition Tracker
+        btnNutrition.setOnClickListener {
+
+            startActivity(
+                Intent(
+                    this,
+                    NutritionActivity::class.java
+                )
+            )
+        }
+
+        // Profile
+        btnProfile.setOnClickListener {
+
+            startActivity(
+                Intent(
+                    this,
+                    ProfileActivity::class.java
+                )
             )
         }
 
@@ -107,49 +143,51 @@ class MainActivity : AppCompatActivity() {
 
             val today = LocalDate.now()
 
-            val updatedHabits = habits.map { habit ->
+            val updatedHabits =
+                habits.map { habit ->
 
-                if (habit.lastCompletedDate != null) {
+                    if (habit.lastCompletedDate != null) {
 
-                    val lastDate =
-                        LocalDate.parse(habit.lastCompletedDate)
+                        val lastDate =
+                            LocalDate.parse(
+                                habit.lastCompletedDate
+                            )
 
-                    val daysSinceLastCompletion =
-                        ChronoUnit.DAYS.between(
-                            lastDate,
-                            today
-                        ).toInt()
+                        val daysSinceLastCompletion =
+                            ChronoUnit.DAYS.between(
+                                lastDate,
+                                today
+                            ).toInt()
 
-                    val missedDays =
-                        if (daysSinceLastCompletion > 0) {
-                            daysSinceLastCompletion - 1
+                        val missedDays =
+                            if (daysSinceLastCompletion > 0)
+                                daysSinceLastCompletion - 1
+                            else
+                                0
+
+                        if (missedDays > 3) {
+
+                            habit.copy(
+                                currentStreak = 0,
+                                missedDays = missedDays,
+                                isCompletedToday = false
+                            )
+
                         } else {
-                            0
+
+                            habit.copy(
+                                missedDays = missedDays,
+                                isCompletedToday =
+                                    habit.lastCompletedDate ==
+                                            today.toString()
+                            )
                         }
-
-                    if (missedDays > 3) {
-
-                        habit.copy(
-                            currentStreak = 0,
-                            missedDays = missedDays,
-                            isCompletedToday = false
-                        )
 
                     } else {
 
-                        habit.copy(
-                            missedDays = missedDays,
-                            isCompletedToday =
-                                habit.lastCompletedDate ==
-                                        today.toString()
-                        )
+                        habit
                     }
-
-                } else {
-
-                    habit
                 }
-            }
 
             updatedHabits.forEach { habit ->
 
@@ -164,13 +202,12 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 val maxStreak =
-                    if (updatedHabits.isEmpty()) {
+                    if (updatedHabits.isEmpty())
                         0
-                    } else {
+                    else
                         updatedHabits.maxOf {
                             it.currentStreak
                         }
-                    }
 
                 tvStreak.text =
                     "🔥 Current Streak: $maxStreak Days"
@@ -205,33 +242,39 @@ class MainActivity : AppCompatActivity() {
                     ).toInt()
 
                 val missedDays =
-                    if (daysSinceLastCompletion > 0) {
+                    if (daysSinceLastCompletion > 0)
                         daysSinceLastCompletion - 1
-                    } else {
+                    else
                         0
+
+                newStreak =
+                    when {
+
+                        daysSinceLastCompletion == 0 ->
+                            habit.currentStreak
+
+                        missedDays in 1..3 ->
+                            habit.currentStreak + 1
+
+                        missedDays > 3 ->
+                            1
+
+                        else ->
+                            habit.currentStreak
                     }
-
-                newStreak = when {
-
-                    daysSinceLastCompletion == 0 ->
-                        habit.currentStreak
-
-                    missedDays in 1..3 ->
-                        habit.currentStreak + 1
-
-                    missedDays > 3 ->
-                        1
-
-                    else ->
-                        habit.currentStreak
-                }
             }
 
             val updatedHabit =
                 habit.copy(
-                    currentStreak = newStreak,
-                    lastCompletedDate = today.toString(),
+
+                    currentStreak =
+                        newStreak,
+
+                    lastCompletedDate =
+                        today.toString(),
+
                     missedDays = 0,
+
                     isCompletedToday = true
                 )
 
@@ -244,7 +287,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun editHabit(habit: Habit) {
 
-        val editText = EditText(this)
+        val editText =
+            EditText(this)
 
         editText.setText(habit.name)
 
@@ -256,12 +300,17 @@ class MainActivity : AppCompatActivity() {
         )
 
         AlertDialog.Builder(this)
+
             .setTitle("Edit Habit")
+
             .setView(editText)
+
             .setPositiveButton("Save") { _, _ ->
 
                 val newName =
-                    editText.text.toString().trim()
+                    editText.text
+                        .toString()
+                        .trim()
 
                 if (newName.isEmpty()) {
 
@@ -281,23 +330,33 @@ class MainActivity : AppCompatActivity() {
                             )
 
                         database.habitDao()
-                            .updateHabit(updatedHabit)
+                            .updateHabit(
+                                updatedHabit
+                            )
 
                         loadHabits()
                     }
                 }
             }
-            .setNegativeButton("Cancel", null)
+
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+
             .show()
     }
 
     private fun deleteHabit(habit: Habit) {
 
         AlertDialog.Builder(this)
+
             .setTitle("Delete Habit")
+
             .setMessage(
                 "Are you sure you want to delete \"${habit.name}\"?"
             )
+
             .setPositiveButton("Delete") { _, _ ->
 
                 lifecycleScope.launch {
@@ -314,7 +373,12 @@ class MainActivity : AppCompatActivity() {
                     loadHabits()
                 }
             }
-            .setNegativeButton("Cancel", null)
+
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+
             .show()
     }
 }

@@ -33,6 +33,20 @@
         android:layout_marginBottom="10dp"/>
 
     <Button
+        android:id="@+id/btnNutrition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🍎 Nutrition Tracker"
+        android:layout_marginBottom="10dp"/>
+
+    <Button
+        android:id="@+id/btnProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="👤 My Profile"
+        android:layout_marginBottom="10dp"/>
+
+    <Button
         android:id="@+id/btnStatistics"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -17,4 +17,10 @@ data class Habit(
     val missedDays: Int = 0,
 
     val isCompletedToday: Boolean = false,
+
+    val dailyTarget: Double = 0.0,
+
+    val targetUnit: String = "",
+
+    val todayProgress: Double = 0.0,
 )
