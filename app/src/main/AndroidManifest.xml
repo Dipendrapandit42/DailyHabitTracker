@@ -47,6 +47,15 @@
             android:name=".AddFoodActivity"
             android:exported="false" />
 
+        <!-- Exercise Tracker -->
+        <activity
+            android:name=".ExerciseActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AddExerciseActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".ReminderReceiver"
             android:exported="false" />

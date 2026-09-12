@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🏃 Add Exercise"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="30dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exercise Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etExerciseName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Example: Running"
+            android:inputType="text"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Duration (minutes)"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Example: 30"
+            android:inputType="number"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/tvCaloriesPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔥 Calories Burned: Will be calculated"
+            android:textSize="17sp"
+            android:layout_marginBottom="25dp"/>
+
+        <Button
+            android:id="@+id/btnSaveExercise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="💾 Save Exercise"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+
+</ScrollView>

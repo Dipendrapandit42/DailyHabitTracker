@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvExerciseName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Running"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="6dp"/>
+
+    <TextView
+        android:id="@+id/tvExerciseDuration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="⏱️ 30 minutes"
+        android:textSize="16sp"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvExerciseCalories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🔥 300 kcal"
+        android:textSize="16sp"
+        android:layout_marginBottom="10dp"/>
+
+    <Button
+        android:id="@+id/btnCompleteExercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="✅ Complete Exercise"/>
+
+</LinearLayout>

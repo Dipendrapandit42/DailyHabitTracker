@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnAddHabit: Button
     private lateinit var btnStatistics: Button
     private lateinit var btnNutrition: Button
+    private lateinit var btnExercise: Button
     private lateinit var btnProfile: Button
     private lateinit var tvStreak: TextView
     private lateinit var recyclerViewHabits: RecyclerView
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         btnAddHabit = findViewById(R.id.btnAddHabit)
         btnStatistics = findViewById(R.id.btnStatistics)
         btnNutrition = findViewById(R.id.btnNutrition)
+        btnExercise = findViewById(R.id.btnExercise)
         btnProfile = findViewById(R.id.btnProfile)
         tvStreak = findViewById(R.id.tvStreak)
         recyclerViewHabits = findViewById(R.id.recyclerViewHabits)
@@ -48,11 +50,9 @@ class MainActivity : AppCompatActivity() {
 
         // Request notification permission for Android 13+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
             ) {
-
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.POST_NOTIFICATIONS),
@@ -111,6 +111,17 @@ class MainActivity : AppCompatActivity() {
                 Intent(
                     this,
                     NutritionActivity::class.java
+                )
+            )
+        }
+
+        // Exercise Tracker
+        btnExercise.setOnClickListener {
+
+            startActivity(
+                Intent(
+                    this,
+                    ExerciseActivity::class.java
                 )
             )
         }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🏃 Exercise Tracker"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="25dp"/>
+
+        <TextView
+            android:id="@+id/tvExercisePercentage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Today's Completion: 0%"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:id="@+id/tvExerciseStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Complete your exercises to continue your streak."
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="25dp"/>
+
+        <Button
+            android:id="@+id/btnAddExercise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Add Exercise"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewExercises"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/tvCaloriesBurned"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔥 Calories Burned: 0 kcal"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+</ScrollView>

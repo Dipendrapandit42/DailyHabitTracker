@@ -12,10 +12,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         Habit::class,
         FoodItem::class,
         NutritionEntry::class,
-        UserProfile::class
+        UserProfile::class,
+        Exercise::class,
     ],
-    version = 3,
-    exportSchema = false
+    version = 4,
+    exportSchema = false,
 )
 abstract class HabitDatabase : RoomDatabase() {
 
@@ -27,17 +28,17 @@ abstract class HabitDatabase : RoomDatabase() {
 
     abstract fun userProfileDao(): UserProfileDao
 
+    abstract fun exerciseDao(): ExerciseDao
+
     companion object {
 
         @Volatile
         private var INSTANCE: HabitDatabase? = null
 
-        // Database version 1 → 2 migration
         private val MIGRATION_1_2 = object : Migration(1, 2) {
 
             override fun migrate(database: SupportSQLiteDatabase) {
 
-                // New columns in habits table
                 database.execSQL(
                     "ALTER TABLE habits ADD COLUMN dailyTarget REAL NOT NULL DEFAULT 0.0"
                 )
@@ -50,7 +51,6 @@ abstract class HabitDatabase : RoomDatabase() {
                     "ALTER TABLE habits ADD COLUMN todayProgress REAL NOT NULL DEFAULT 0.0"
                 )
 
-                // Food database
                 database.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS food_items (
@@ -69,7 +69,6 @@ abstract class HabitDatabase : RoomDatabase() {
                     """.trimIndent()
                 )
 
-                // Daily nutrition entries
                 database.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS nutrition_entries (
@@ -93,12 +92,10 @@ abstract class HabitDatabase : RoomDatabase() {
             }
         }
 
-        // Database version 2 → 3 migration
         private val MIGRATION_2_3 = object : Migration(2, 3) {
 
             override fun migrate(database: SupportSQLiteDatabase) {
 
-                // User profile table
                 database.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS user_profile (
@@ -116,6 +113,25 @@ abstract class HabitDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+
+            override fun migrate(database: SupportSQLiteDatabase) {
+
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS exercises (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        durationMinutes INTEGER NOT NULL,
+                        caloriesBurned REAL NOT NULL,
+                        isCompleted INTEGER NOT NULL,
+                        date TEXT NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun getDatabase(context: Context): HabitDatabase {
 
             return INSTANCE ?: synchronized(this) {
@@ -127,7 +143,8 @@ abstract class HabitDatabase : RoomDatabase() {
                 )
                     .addMigrations(
                         MIGRATION_1_2,
-                        MIGRATION_2_3
+                        MIGRATION_2_3,
+                        MIGRATION_3_4
                     )
                     .build()
 

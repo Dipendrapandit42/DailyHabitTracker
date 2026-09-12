@@ -68,8 +68,12 @@ class NutritionActivity : AppCompatActivity() {
 
             val today = LocalDate.now().toString()
 
+            // ---------------- PROFILE ----------------
+
             val profile =
                 database.userProfileDao().getProfile()
+
+            // ---------------- FOOD NUTRITION ----------------
 
             val calories =
                 database.nutritionDao()
@@ -111,11 +115,30 @@ class NutritionActivity : AppCompatActivity() {
                 database.nutritionDao()
                     .getEntriesForDate(today)
 
+            // ---------------- EXERCISE CALORIES ----------------
+
+            val exercises =
+                database.exerciseDao()
+                    .getExercisesForDate(today)
+
+            val exerciseCalories =
+                exercises
+                    .filter { it.isCompleted }
+                    .sumOf { it.caloriesBurned }
+
+            // ---------------- PROFILE EXISTS ----------------
+
             if (profile != null) {
 
-                val calorieGoal =
+                // Base calorie requirement
+                val baseCalorieGoal =
                     NutritionCalculator.calculateCalories(profile)
 
+                // Add calories burned through completed exercise
+                val adjustedCalorieGoal =
+                    baseCalorieGoal + exerciseCalories
+
+                // Protein goal
                 val proteinGoal =
                     NutritionCalculator.calculateProtein(profile)
 
@@ -123,13 +146,25 @@ class NutritionActivity : AppCompatActivity() {
                     (proteinGoal - protein)
                         .coerceAtLeast(0.0)
 
+                // Remaining calories
+                val remainingCalories =
+                    (adjustedCalorieGoal - calories)
+                        .coerceAtLeast(0.0)
+
                 runOnUiThread {
 
+                    // ---------------- CALORIES ----------------
+
                     tvCalorieGoal.text =
-                        "🔥 Calorie Goal: ${calorieGoal.toInt()} kcal"
+                        "🔥 Daily Calorie Goal: ${adjustedCalorieGoal.toInt()} kcal\n" +
+                                "Base Goal: ${baseCalorieGoal.toInt()} kcal\n" +
+                                "🏃 Exercise Added: ${exerciseCalories.toInt()} kcal"
 
                     tvCalories.text =
-                        "Calories Consumed: ${calories.toInt()} kcal"
+                        "🍎 Calories Consumed: ${calories.toInt()} kcal\n" +
+                                "📊 Calories Remaining: ${remainingCalories.toInt()} kcal"
+
+                    // ---------------- PROTEIN ----------------
 
                     tvProteinGoal.text =
                         "💪 Protein Goal: ${proteinGoal.toInt()} g"
@@ -144,8 +179,11 @@ class NutritionActivity : AppCompatActivity() {
 
                     tvProteinRemaining.text =
                         if (remainingProtein <= 0) {
+
                             "✅ Protein Goal Completed!"
+
                         } else {
+
                             "Protein Remaining: ${
                                 String.format(
                                     "%.1f",
@@ -153,6 +191,8 @@ class NutritionActivity : AppCompatActivity() {
                                 )
                             } g"
                         }
+
+                    // ---------------- MACROS ----------------
 
                     tvCarbs.text =
                         "🍚 Carbohydrates: ${
@@ -177,6 +217,8 @@ class NutritionActivity : AppCompatActivity() {
                                 fiber
                             )
                         } g"
+
+                    // ---------------- VITAMINS & MINERALS ----------------
 
                     tvVitamins.text =
                         "🍊 Vitamin A: ${
@@ -206,6 +248,8 @@ class NutritionActivity : AppCompatActivity() {
                                         iron
                                     )
                                 } mg"
+
+                    // ---------------- FOOD LOG ----------------
 
                     if (foodEntries.isEmpty()) {
 
@@ -248,6 +292,8 @@ class NutritionActivity : AppCompatActivity() {
                 }
 
             } else {
+
+                // ---------------- NO PROFILE ----------------
 
                 runOnUiThread {
 

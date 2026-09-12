@@ -40,6 +40,13 @@
         android:layout_marginBottom="10dp"/>
 
     <Button
+        android:id="@+id/btnExercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🏃 Exercise Tracker"
+        android:layout_marginBottom="10dp"/>
+
+    <Button
         android:id="@+id/btnProfile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
