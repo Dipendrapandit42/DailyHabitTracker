@@ -1129,4 +1129,4 @@ class AddFoodActivity : AppCompatActivity() {
             }
         }
     }
-}
+ }

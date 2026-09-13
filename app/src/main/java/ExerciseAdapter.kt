@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ExerciseAdapter(
     private var exercises: List<Exercise>,
-    private val onCompleteClick: (Exercise) -> Unit
+    private val onCompleteClick: (Exercise) -> Unit,
+    private val onEditClick: (Exercise) -> Unit,
+    private val onDeleteClick: (Exercise) -> Unit
 ) : RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder>() {
 
     class ExerciseViewHolder(itemView: View) :
@@ -26,6 +28,12 @@ class ExerciseAdapter(
 
         val btnCompleteExercise: Button =
             itemView.findViewById(R.id.btnCompleteExercise)
+
+        val btnEditExercise: Button =
+            itemView.findViewById(R.id.btnEditExercise)
+
+        val btnDeleteExercise: Button =
+            itemView.findViewById(R.id.btnDeleteExercise)
     }
 
     override fun onCreateViewHolder(
@@ -74,6 +82,14 @@ class ExerciseAdapter(
             holder.btnCompleteExercise.setOnClickListener {
                 onCompleteClick(exercise)
             }
+        }
+
+        holder.btnEditExercise.setOnClickListener {
+            onEditClick(exercise)
+        }
+
+        holder.btnDeleteExercise.setOnClickListener {
+            onDeleteClick(exercise)
         }
     }
 

@@ -3,7 +3,10 @@ package com.example.dailyhabittracker
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,10 +39,20 @@ class ExerciseActivity : AppCompatActivity() {
         database = HabitDatabase.getDatabase(this)
 
         exerciseAdapter = ExerciseAdapter(
-            emptyList()
-        ) { exercise ->
-            completeExercise(exercise)
-        }
+            emptyList(),
+
+            onCompleteClick = { exercise ->
+                completeExercise(exercise)
+            },
+
+            onEditClick = { exercise ->
+                editExercise(exercise)
+            },
+
+            onDeleteClick = { exercise ->
+                deleteExercise(exercise)
+            }
+        )
 
         recyclerViewExercises.layoutManager =
             LinearLayoutManager(this)
@@ -93,8 +106,117 @@ class ExerciseActivity : AppCompatActivity() {
             database.exerciseDao()
                 .updateExercise(updatedExercise)
 
+            Toast.makeText(
+                this@ExerciseActivity,
+                "Exercise completed ✅",
+                Toast.LENGTH_SHORT
+            ).show()
+
             loadExercises()
         }
+    }
+
+    private fun editExercise(
+        exercise: Exercise
+    ) {
+
+        val editText = EditText(this)
+
+        editText.setText(exercise.name)
+
+        editText.setPadding(
+            40,
+            20,
+            40,
+            20
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle("✏️ Edit Exercise")
+            .setMessage(
+                "Change exercise name.\nCurrent duration: ${exercise.durationMinutes} minutes"
+            )
+            .setView(editText)
+
+            .setPositiveButton("Save") { _, _ ->
+
+                val newName =
+                    editText.text.toString().trim()
+
+                if (newName.isEmpty()) {
+
+                    Toast.makeText(
+                        this,
+                        "Exercise name cannot be empty",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+
+                    lifecycleScope.launch {
+
+                        val updatedExercise =
+                            exercise.copy(
+                                name = newName
+                            )
+
+                        database.exerciseDao()
+                            .updateExercise(updatedExercise)
+
+                        Toast.makeText(
+                            this@ExerciseActivity,
+                            "Exercise updated ✅",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        loadExercises()
+                    }
+                }
+            }
+
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+
+            .show()
+    }
+
+    private fun deleteExercise(
+        exercise: Exercise
+    ) {
+
+        AlertDialog.Builder(this)
+
+            .setTitle("🗑️ Delete Exercise")
+
+            .setMessage(
+                "Are you sure you want to delete \"${exercise.name}\"?"
+            )
+
+            .setPositiveButton("Delete") { _, _ ->
+
+                lifecycleScope.launch {
+
+                    database.exerciseDao()
+                        .deleteExercise(exercise)
+
+                    Toast.makeText(
+                        this@ExerciseActivity,
+                        "Exercise deleted 🗑️",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    loadExercises()
+                }
+            }
+
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+
+            .show()
     }
 
     private fun updateExerciseProgress(
@@ -113,14 +235,20 @@ class ExerciseActivity : AppCompatActivity() {
             if (totalExercises == 0) {
                 0.0
             } else {
-                (completedExercises.toDouble()
-                        / totalExercises.toDouble()) * 100
+                (
+                        completedExercises.toDouble()
+                                / totalExercises.toDouble()
+                        ) * 100
             }
 
         val caloriesBurned =
             exercises
-                .filter { it.isCompleted }
-                .sumOf { it.caloriesBurned }
+                .filter {
+                    it.isCompleted
+                }
+                .sumOf {
+                    it.caloriesBurned
+                }
 
         runOnUiThread {
 
@@ -147,14 +275,12 @@ class ExerciseActivity : AppCompatActivity() {
 
                     tvExerciseStatus.text =
                         "Add exercises for today."
-
                 }
 
                 percentage >= 75.0 -> {
 
                     tvExerciseStatus.text =
                         "🎉 75%+ completed! Streak continues 🔥"
-
                 }
 
                 else -> {

@@ -4,6 +4,15 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Exact alarm permission -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- Full-screen alarm permission -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!-- Reschedule alarms after phone restart -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -56,9 +65,40 @@
             android:name=".AddExerciseActivity"
             android:exported="false" />
 
+        <!-- Exercise Reminder -->
+        <activity
+            android:name=".ReminderActivity"
+            android:exported="false" />
+
+        <!-- Alarm Screen -->
+        <activity
+            android:name=".AlarmActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true" />
+
+        <!-- Existing fixed reminders -->
         <receiver
             android:name=".ReminderReceiver"
             android:exported="false" />
+
+        <!-- Custom alarm receiver -->
+        <receiver
+            android:name=".CustomReminderReceiver"
+            android:exported="false" />
+
+        <!-- Restart alarms after device reboot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+        </receiver>
 
     </application>
 

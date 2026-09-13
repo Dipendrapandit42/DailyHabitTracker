@@ -14,61 +14,66 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🏃 Exercise Tracker"
+            android:text="⏰ Alarm"
             android:textSize="28sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_marginBottom="25dp"/>
+            android:layout_marginBottom="30dp"/>
 
         <TextView
-            android:id="@+id/tvExercisePercentage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📊 Today's Completion: 0%"
-            android:textSize="20sp"
+            android:text="Alarm Message"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:id="@+id/tvExerciseStatus"
+        <EditText
+            android:id="@+id/etReminderMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Complete your exercises to continue your streak."
-            android:textSize="16sp"
-            android:gravity="center"
+            android:hint="Example: Exercise ka time ho gaya"
+            android:inputType="text"
             android:layout_marginBottom="25dp"/>
 
-        <Button
-            android:id="@+id/btnAddExercise"
+        <TextView
+            android:id="@+id/tvSelectedTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="+ Add Exercise"
+            android:text="🕐 Selected Time: Not selected"
             android:textSize="18sp"
-            android:layout_marginBottom="10dp"/>
+            android:gravity="center"
+            android:layout_marginBottom="15dp"/>
 
         <Button
-            android:id="@+id/btnExerciseReminder"
+            android:id="@+id/btnSelectTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⏰ Set Exercise Reminder"
+            android:text="🕐 Select Alarm Time"
+            android:textSize="17sp"
+            android:layout_marginBottom="15dp"/>
+
+        <Button
+            android:id="@+id/btnSaveReminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔔 Set Alarm"
             android:textSize="18sp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="25dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Saved Alarms"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewExercises"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginBottom="20dp"/>
-
-        <TextView
-            android:id="@+id/tvCaloriesBurned"
+            android:id="@+id/recyclerViewReminders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🔥 Calories Burned: 0 kcal"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:nestedScrollingEnabled="false"/>
 
     </LinearLayout>
 

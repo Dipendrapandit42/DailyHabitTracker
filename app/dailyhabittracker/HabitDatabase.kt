@@ -14,21 +14,19 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         NutritionEntry::class,
         UserProfile::class,
         Exercise::class,
+        Reminder::class
     ],
-    version = 4,
-    exportSchema = false,
+    version = 5,
+    exportSchema = false
 )
 abstract class HabitDatabase : RoomDatabase() {
 
     abstract fun habitDao(): HabitDao
-
     abstract fun foodDao(): FoodDao
-
     abstract fun nutritionDao(): NutritionDao
-
     abstract fun userProfileDao(): UserProfileDao
-
     abstract fun exerciseDao(): ExerciseDao
+    abstract fun reminderDao(): ReminderDao
 
     companion object {
 
@@ -36,7 +34,6 @@ abstract class HabitDatabase : RoomDatabase() {
         private var INSTANCE: HabitDatabase? = null
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
-
             override fun migrate(database: SupportSQLiteDatabase) {
 
                 database.execSQL(
@@ -93,7 +90,6 @@ abstract class HabitDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_2_3 = object : Migration(2, 3) {
-
             override fun migrate(database: SupportSQLiteDatabase) {
 
                 database.execSQL(
@@ -114,7 +110,6 @@ abstract class HabitDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_3_4 = object : Migration(3, 4) {
-
             override fun migrate(database: SupportSQLiteDatabase) {
 
                 database.execSQL(
@@ -126,6 +121,22 @@ abstract class HabitDatabase : RoomDatabase() {
                         caloriesBurned REAL NOT NULL,
                         isCompleted INTEGER NOT NULL,
                         date TEXT NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS reminders (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        time TEXT NOT NULL,
+                        message TEXT NOT NULL,
+                        isEnabled INTEGER NOT NULL
                     )
                     """.trimIndent()
                 )
@@ -144,11 +155,13 @@ abstract class HabitDatabase : RoomDatabase() {
                     .addMigrations(
                         MIGRATION_1_2,
                         MIGRATION_2_3,
-                        MIGRATION_3_4
+                        MIGRATION_3_4,
+                        MIGRATION_4_5
                     )
                     .build()
 
                 INSTANCE = instance
+
                 instance
             }
         }

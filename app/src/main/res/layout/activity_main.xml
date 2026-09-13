@@ -32,6 +32,15 @@
         android:text="+ Add Habit"
         android:layout_marginBottom="10dp"/>
 
+    <!-- Alarm Button -->
+    <Button
+        android:id="@+id/btnAlarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="⏰ Alarm"
+        android:textSize="18sp"
+        android:layout_marginBottom="10dp"/>
+
     <Button
         android:id="@+id/btnNutrition"
         android:layout_width="match_parent"

@@ -1,9 +1,12 @@
 package com.example.dailyhabittracker
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +17,7 @@ import java.time.LocalDate
 class ExerciseActivity : AppCompatActivity() {
 
     private lateinit var btnAddExercise: Button
+    private lateinit var btnExerciseReminder: Button
     private lateinit var recyclerViewExercises: RecyclerView
     private lateinit var tvExercisePercentage: TextView
     private lateinit var tvExerciseStatus: TextView
@@ -28,6 +32,7 @@ class ExerciseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_exercise)
 
         btnAddExercise = findViewById(R.id.btnAddExercise)
+        btnExerciseReminder = findViewById(R.id.btnExerciseReminder)
         recyclerViewExercises = findViewById(R.id.recyclerViewExercises)
         tvExercisePercentage = findViewById(R.id.tvExercisePercentage)
         tvExerciseStatus = findViewById(R.id.tvExerciseStatus)
@@ -36,10 +41,20 @@ class ExerciseActivity : AppCompatActivity() {
         database = HabitDatabase.getDatabase(this)
 
         exerciseAdapter = ExerciseAdapter(
-            emptyList()
-        ) { exercise ->
-            completeExercise(exercise)
-        }
+            emptyList(),
+
+            onCompleteClick = { exercise ->
+                completeExercise(exercise)
+            },
+
+            onEditClick = { exercise ->
+                editExercise(exercise)
+            },
+
+            onDeleteClick = { exercise ->
+                deleteExercise(exercise)
+            }
+        )
 
         recyclerViewExercises.layoutManager =
             LinearLayoutManager(this)
@@ -52,6 +67,15 @@ class ExerciseActivity : AppCompatActivity() {
                 Intent(
                     this,
                     AddExerciseActivity::class.java
+                )
+            )
+        }
+
+        btnExerciseReminder.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    ReminderActivity::class.java
                 )
             )
         }
@@ -97,6 +121,94 @@ class ExerciseActivity : AppCompatActivity() {
         }
     }
 
+    private fun editExercise(
+        exercise: Exercise
+    ) {
+
+        val editText = EditText(this)
+
+        editText.setText(exercise.name)
+        editText.setPadding(40, 20, 40, 20)
+
+        AlertDialog.Builder(this)
+            .setTitle("Edit Exercise")
+            .setView(editText)
+
+            .setPositiveButton("Save") { _, _ ->
+
+                val newName =
+                    editText.text.toString().trim()
+
+                if (newName.isEmpty()) {
+
+                    Toast.makeText(
+                        this,
+                        "Exercise name cannot be empty",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+
+                    lifecycleScope.launch {
+
+                        val updatedExercise =
+                            exercise.copy(
+                                name = newName
+                            )
+
+                        database.exerciseDao()
+                            .updateExercise(updatedExercise)
+
+                        loadExercises()
+                    }
+                }
+            }
+
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+
+            .show()
+    }
+
+    private fun deleteExercise(
+        exercise: Exercise
+    ) {
+
+        AlertDialog.Builder(this)
+
+            .setTitle("Delete Exercise")
+
+            .setMessage(
+                "Are you sure you want to delete \"${exercise.name}\"?"
+            )
+
+            .setPositiveButton("Delete") { _, _ ->
+
+                lifecycleScope.launch {
+
+                    database.exerciseDao()
+                        .deleteExercise(exercise)
+
+                    Toast.makeText(
+                        this@ExerciseActivity,
+                        "Exercise deleted",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    loadExercises()
+                }
+            }
+
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+
+            .show()
+    }
+
     private fun updateExerciseProgress(
         exercises: List<Exercise>
     ) {
@@ -113,14 +225,20 @@ class ExerciseActivity : AppCompatActivity() {
             if (totalExercises == 0) {
                 0.0
             } else {
-                (completedExercises.toDouble()
-                        / totalExercises.toDouble()) * 100
+                (
+                        completedExercises.toDouble()
+                                / totalExercises.toDouble()
+                        ) * 100
             }
 
         val caloriesBurned =
             exercises
-                .filter { it.isCompleted }
-                .sumOf { it.caloriesBurned }
+                .filter {
+                    it.isCompleted
+                }
+                .sumOf {
+                    it.caloriesBurned
+                }
 
         runOnUiThread {
 

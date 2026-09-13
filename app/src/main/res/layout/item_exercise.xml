@@ -37,6 +37,30 @@
         android:id="@+id/btnCompleteExercise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="✅ Complete Exercise"/>
+        android:text="✅ Complete Exercise"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnEditExercise"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="✏️ Edit"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btnDeleteExercise"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🗑️ Delete"
+            android:layout_marginStart="4dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>
