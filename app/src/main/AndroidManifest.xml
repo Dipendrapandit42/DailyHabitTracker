@@ -2,16 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Exact alarm permission -->
+    <!-- Exact alarm -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <!-- Full-screen alarm permission -->
+    <!-- Full-screen alarm -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
-    <!-- Reschedule alarms after phone restart -->
+    <!-- Restart alarms after phone reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Alarm support -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -23,14 +28,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DailyHabitTracker">
 
+        <!-- Opening / Splash Screen -->
         <activity
-            android:name=".AddHabitActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".SplashActivity"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,15 +40,33 @@
 
         </activity>
 
+        <!-- Habit -->
+        <activity
+            android:name=".AddHabitActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AllHabitsActivity"
+            android:exported="false" />
+
+        <!-- Main Screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Statistics -->
         <activity
             android:name=".StatisticsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Profile -->
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />
 
+        <!-- Nutrition -->
         <activity
             android:name=".NutritionActivity"
             android:exported="false" />
@@ -56,7 +75,7 @@
             android:name=".AddFoodActivity"
             android:exported="false" />
 
-        <!-- Exercise Tracker -->
+        <!-- Exercise -->
         <activity
             android:name=".ExerciseActivity"
             android:exported="false" />
@@ -65,7 +84,7 @@
             android:name=".AddExerciseActivity"
             android:exported="false" />
 
-        <!-- Exercise Reminder -->
+        <!-- Reminder -->
         <activity
             android:name=".ReminderActivity"
             android:exported="false" />
@@ -76,19 +95,20 @@
             android:exported="false"
             android:launchMode="singleTop"
             android:showWhenLocked="true"
-            android:turnScreenOn="true" />
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true" />
 
-        <!-- Existing fixed reminders -->
+        <!-- Reminder Receiver -->
         <receiver
             android:name=".ReminderReceiver"
             android:exported="false" />
 
-        <!-- Custom alarm receiver -->
+        <!-- Custom Alarm Receiver -->
         <receiver
             android:name=".CustomReminderReceiver"
             android:exported="false" />
 
-        <!-- Restart alarms after device reboot -->
+        <!-- Re-schedule alarms after reboot -->
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"

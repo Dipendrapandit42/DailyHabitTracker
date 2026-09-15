@@ -2,77 +2,569 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:background="#F7F5FA"
+    android:paddingStart="18dp"
+    android:paddingEnd="18dp"
+    android:paddingTop="14dp">
 
-    <TextView
+    <!-- ============================= -->
+    <!-- HEADER -->
+    <!-- ============================= -->
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Daily Habit Tracker"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
 
-    <TextView
-        android:id="@+id/tvStreak"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvGreeting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Good Morning ☀️"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#77717F"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Daily Habit Tracker"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                android:textColor="#27213A"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Build better habits, one day at a time 🌱"
+                android:textSize="13sp"
+                android:textColor="#8A8493"
+                android:layout_marginTop="3dp"/>
+
+        </LinearLayout>
+
+        <!-- Profile Icon -->
+
+        <TextView
+            android:id="@+id/tvProfileIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="👤"
+            android:textSize="24sp"
+            android:background="#E9DFFD"
+            android:contentDescription="Profile"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginStart="10dp"/>
+
+    </LinearLayout>
+
+
+    <!-- ============================= -->
+    <!-- STREAK CARD -->
+    <!-- ============================= -->
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🔥 Current Streak: 0 Days"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="18dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="#6B4FA8">
 
-    <Button
-        android:id="@+id/btnAddHabit"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:gravity="center"
+                android:text="🔥"
+                android:textSize="30sp"
+                android:background="#8067B8"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="14dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CURRENT STREAK"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#DDD2F1"
+                    android:letterSpacing="0.08"/>
+
+                <TextView
+                    android:id="@+id/tvStreak"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔥 Current Streak: 0 Days"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Keep going — you're doing great!"
+                    android:textSize="12sp"
+                    android:textColor="#E9DFFD"
+                    android:layout_marginTop="3dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <!-- ============================= -->
+    <!-- QUICK ACTIONS HEADER -->
+    <!-- ============================= -->
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="+ Add Habit"
-        android:layout_marginBottom="10dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="10dp">
 
-    <!-- Alarm Button -->
-    <Button
-        android:id="@+id/btnAlarm"
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Quick Actions"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#27213A"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manage"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#6B4FA8"/>
+
+    </LinearLayout>
+
+
+    <!-- ============================= -->
+    <!-- QUICK ACTION GRID -->
+    <!-- ============================= -->
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="⏰ Alarm"
-        android:textSize="18sp"
-        android:layout_marginBottom="10dp"/>
+        android:orientation="vertical"
+        android:layout_marginBottom="18dp">
 
-    <Button
-        android:id="@+id/btnNutrition"
+        <!-- ROW 1 -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <!-- Add Habit -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAddHabit"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E9E2F2"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginEnd="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="＋"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="#6B4FA8"
+                        android:background="#EFE8FA"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Add Habit"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#302A3D"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Alarm -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAlarm"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E9E2F2"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginStart="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="⏰"
+                        android:textSize="22sp"
+                        android:background="#FFF0DA"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Alarm"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#302A3D"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+
+        <!-- ROW 2 -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <!-- Nutrition -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnNutrition"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E9E2F2"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginEnd="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="🍎"
+                        android:textSize="21sp"
+                        android:background="#E9F7EA"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Nutrition"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#302A3D"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Exercise -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnExercise"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E9E2F2"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginStart="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="🏃"
+                        android:textSize="21sp"
+                        android:background="#E7F3FF"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Exercise"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#302A3D"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+
+        <!-- ROW 3 -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Statistics -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnStatistics"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E9E2F2"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginEnd="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="📊"
+                        android:textSize="20sp"
+                        android:background="#F1E8FF"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Statistics"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#302A3D"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Profile -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnProfile"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E9E2F2"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginStart="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="👤"
+                        android:textSize="20sp"
+                        android:background="#FFEAF1"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="My Profile"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#302A3D"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <!-- ============================= -->
+    <!-- YOUR HABITS HEADER -->
+    <!-- ============================= -->
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🍎 Nutrition Tracker"
-        android:layout_marginBottom="10dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="8dp">
 
-    <Button
-        android:id="@+id/btnExercise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="🏃 Exercise Tracker"
-        android:layout_marginBottom="10dp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Your Habits"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#27213A"/>
 
-    <Button
-        android:id="@+id/btnProfile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="👤 My Profile"
-        android:layout_marginBottom="10dp"/>
+        <!-- VIEW ALL ARROW -->
 
-    <Button
-        android:id="@+id/btnStatistics"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📊 Statistics"
-        android:layout_marginBottom="20dp"/>
+        <TextView
+            android:id="@+id/tvViewAllHabits"
+            android:layout_width="44dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="›"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#6B4FA8"
+            android:background="#EDE6F9"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="View all habits"/>
+
+    </LinearLayout>
+
+
+    <!-- ============================= -->
+    <!-- HABIT LIST -->
+    <!-- ============================= -->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewHabits"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        android:overScrollMode="never"/>
+
+
+    <!-- ============================= -->
+    <!-- DEVELOPER -->
+    <!-- ============================= -->
+
+    <TextView
+        android:id="@+id/tvDeveloper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Developer: Dipendra Pandit"
+        android:textSize="11sp"
+        android:textColor="#9A94A3"
+        android:gravity="center"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
 </LinearLayout>

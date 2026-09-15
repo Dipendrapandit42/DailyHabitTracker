@@ -1,66 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_marginBottom="10dp">
-
-    <TextView
-        android:id="@+id/tvExerciseName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Running"
-        android:textSize="19sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="6dp"/>
-
-    <TextView
-        android:id="@+id/tvExerciseDuration"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="⏱️ 30 minutes"
-        android:textSize="16sp"
-        android:layout_marginBottom="4dp"/>
-
-    <TextView
-        android:id="@+id/tvExerciseCalories"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="🔥 300 kcal"
-        android:textSize="16sp"
-        android:layout_marginBottom="10dp"/>
-
-    <Button
-        android:id="@+id/btnCompleteExercise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="✅ Complete Exercise"
-        android:layout_marginBottom="8dp"/>
+    android:layout_margin="6dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="1dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E9E2F2">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- ============================= -->
+        <!-- EXERCISE HEADER -->
+        <!-- ============================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="13dp">
+
+            <TextView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:gravity="center"
+                android:text="🏃"
+                android:textSize="27sp"
+                android:background="#EFE8FA"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/tvExerciseName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Running"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#27213A"/>
+
+        </LinearLayout>
+
+
+        <!-- ============================= -->
+        <!-- EXERCISE DETAILS -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="13dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#F7F4FB">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvExerciseDuration"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="⏱️ 30 minutes"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#66616F"/>
+
+                <TextView
+                    android:id="@+id/tvExerciseCalories"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🔥 300 kcal"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#6B4FA8"
+                    android:gravity="end"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- COMPLETE -->
+        <!-- ============================= -->
 
         <Button
-            android:id="@+id/btnEditExercise"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="✏️ Edit"
-            android:layout_marginEnd="4dp"/>
+            android:id="@+id/btnCompleteExercise"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="✅  Complete Exercise"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#6B4FA8"
+            android:layout_marginBottom="10dp"/>
 
-        <Button
-            android:id="@+id/btnDeleteExercise"
-            android:layout_width="0dp"
+
+        <!-- ============================= -->
+        <!-- EDIT / DELETE -->
+        <!-- ============================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="🗑️ Delete"
-            android:layout_marginStart="4dp"/>
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnEditExercise"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="✏️  Edit"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#5B4AA8"
+                android:backgroundTint="#EEE9F7"
+                android:layout_marginEnd="5dp"/>
+
+            <Button
+                android:id="@+id/btnDeleteExercise"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="🗑️  Delete"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#B3261E"
+                android:backgroundTint="#FBEAEA"
+                android:layout_marginStart="5dp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

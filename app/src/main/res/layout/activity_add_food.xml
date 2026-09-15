@@ -2,70 +2,303 @@
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F7F5FA">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="18dp">
 
-        <TextView
+        <!-- ============================= -->
+        <!-- HEADER -->
+        <!-- ============================= -->
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🍎 Add Food"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="30dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="22dp">
 
-        <TextView
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🍎  FOOD TRACKING"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#7D6AA8"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add Food"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#27213A"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Track what you eat and understand your nutrition."
+                    android:textSize="13sp"
+                    android:textColor="#8A8493"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:gravity="center"
+                android:text="🥗"
+                android:textSize="26sp"
+                android:background="#EAF7EA"/>
+
+        </LinearLayout>
+
+
+        <!-- ============================= -->
+        <!-- FOOD DETAILS CARD -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Food Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="15dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E9E2F2">
 
-        <EditText
-            android:id="@+id/etFoodName"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Food Details"
+                    android:textSize="21sp"
+                    android:textStyle="bold"
+                    android:textColor="#27213A"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enter the food and quantity you consumed."
+                    android:textSize="13sp"
+                    android:textColor="#8A8493"
+                    android:layout_marginBottom="18dp"/>
+
+
+                <!-- FOOD NAME -->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Food Name"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#514B5D"
+                    android:layout_marginBottom="7dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F5F2F8"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2DCE9">
+
+                    <EditText
+                        android:id="@+id/etFoodName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="Example: Rice"
+                        android:textSize="15sp"
+                        android:textColor="#27213A"
+                        android:textColorHint="#AAA4B2"
+                        android:inputType="textCapSentences"
+                        android:singleLine="true"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"/>
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <!-- QUANTITY -->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Quantity"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#514B5D"
+                    android:layout_marginBottom="7dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="18dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F5F2F8"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2DCE9">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/etQuantity"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:hint="Example: 100"
+                            android:textSize="15sp"
+                            android:textColor="#27213A"
+                            android:textColorHint="#AAA4B2"
+                            android:inputType="numberDecimal"
+                            android:singleLine="true"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="grams"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#7D6AA8"
+                            android:paddingEnd="16dp"/>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <!-- INFO -->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💡 Nutrition is calculated automatically from the food database."
+                    android:textSize="12sp"
+                    android:textColor="#77717F"
+                    android:background="#F1EDF7"
+                    android:padding="13dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- NUTRITION PREVIEW -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Example: Rice"
-            android:inputType="text"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="15dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#EDE6F9">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Quantity (grams)"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-        <EditText
-            android:id="@+id/etQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Example: 100"
-            android:inputType="numberDecimal"
-            android:layout_marginBottom="25dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📊 Nutrition Preview"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
+                    android:textColor="#5E4C98"
+                    android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:id="@+id/tvNutritionPreview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nutrition will be calculated automatically"
-            android:textSize="17sp"
-            android:layout_marginBottom="25dp"/>
+                <TextView
+                    android:id="@+id/tvNutritionPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nutrition will be calculated automatically"
+                    android:textSize="15sp"
+                    android:textColor="#625C6D"
+                    android:lineSpacingExtra="3dp"/>
 
-        <Button
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- SAVE FOOD -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnSaveFood"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="💾 Save Food"
-            android:textSize="18sp"/>
+            android:layout_height="58dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#6B4FA8">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💾"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save Food"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

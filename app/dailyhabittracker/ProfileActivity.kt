@@ -1,8 +1,8 @@
 package com.example.dailyhabittracker
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
@@ -12,155 +12,351 @@ import kotlinx.coroutines.launch
 
 class ProfileActivity : AppCompatActivity() {
 
+    private lateinit var etName: EditText
     private lateinit var etAge: EditText
     private lateinit var spGender: Spinner
     private lateinit var etWeight: EditText
     private lateinit var etHeight: EditText
     private lateinit var spActivity: Spinner
     private lateinit var spGoal: Spinner
-    private lateinit var btnSaveProfile: Button
+
+    // New XML uses MaterialCardView
+    private lateinit var btnSaveProfile: View
 
     private lateinit var database: HabitDatabase
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
 
-        etAge = findViewById(R.id.etAge)
-        spGender = findViewById(R.id.spGender)
-        etWeight = findViewById(R.id.etWeight)
-        etHeight = findViewById(R.id.etHeight)
-        spActivity = findViewById(R.id.spActivity)
-        spGoal = findViewById(R.id.spGoal)
-        btnSaveProfile = findViewById(R.id.btnSaveProfile)
+        setContentView(
+            R.layout.activity_profile
+        )
 
-        database = HabitDatabase.getDatabase(this)
+        // ==========================================
+        // FIND VIEWS
+        // ==========================================
+
+        etName =
+            findViewById(R.id.etName)
+
+        etAge =
+            findViewById(R.id.etAge)
+
+        spGender =
+            findViewById(R.id.spGender)
+
+        etWeight =
+            findViewById(R.id.etWeight)
+
+        etHeight =
+            findViewById(R.id.etHeight)
+
+        spActivity =
+            findViewById(R.id.spActivity)
+
+        spGoal =
+            findViewById(R.id.spGoal)
+
+        btnSaveProfile =
+            findViewById(R.id.btnSaveProfile)
+
+        // ==========================================
+        // DATABASE
+        // ==========================================
+
+        database =
+            HabitDatabase.getDatabase(this)
+
+        // ==========================================
+        // SETUP SPINNERS
+        // ==========================================
 
         setupSpinners()
+
+        // ==========================================
+        // LOAD EXISTING PROFILE
+        // ==========================================
+
         loadProfile()
+
+        // ==========================================
+        // SAVE PROFILE
+        // ==========================================
 
         btnSaveProfile.setOnClickListener {
             saveProfile()
         }
     }
 
+    // ==========================================
+    // SETUP SPINNERS
+    // ==========================================
+
     private fun setupSpinners() {
 
-        val genderList = listOf(
-            "Male",
-            "Female"
-        )
+        val genderList =
+            listOf(
+                "Male",
+                "Female"
+            )
 
-        val activityList = listOf(
-            "Low",
-            "Moderate",
-            "High"
-        )
+        val activityList =
+            listOf(
+                "Low",
+                "Moderate",
+                "High"
+            )
 
-        val goalList = listOf(
-            "Maintain",
-            "Gain",
-            "Lose"
-        )
+        val goalList =
+            listOf(
+                "Maintain",
+                "Gain",
+                "Lose"
+            )
 
-        spGender.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            genderList
-        )
+        // ------------------------------------------
+        // GENDER
+        // ------------------------------------------
 
-        spActivity.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            activityList
-        )
+        spGender.adapter =
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                genderList
+            )
 
-        spGoal.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            goalList
-        )
+        // ------------------------------------------
+        // ACTIVITY
+        // ------------------------------------------
+
+        spActivity.adapter =
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                activityList
+            )
+
+        // ------------------------------------------
+        // GOAL
+        // ------------------------------------------
+
+        spGoal.adapter =
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                goalList
+            )
     }
+
+    // ==========================================
+    // LOAD PROFILE
+    // ==========================================
 
     private fun loadProfile() {
 
         lifecycleScope.launch {
 
-            val profile = database.userProfileDao().getProfile()
+            val profile =
+                database.userProfileDao()
+                    .getProfile()
 
             if (profile != null) {
 
-                etAge.setText(profile.age.toString())
-                etWeight.setText(profile.weightKg.toString())
-                etHeight.setText(profile.heightCm.toString())
+                runOnUiThread {
 
-                setSpinnerValue(spGender, profile.gender)
-                setSpinnerValue(spActivity, profile.activityLevel)
-                setSpinnerValue(spGoal, profile.goal)
+                    etName.setText(
+                        profile.name
+                    )
+
+                    etAge.setText(
+                        profile.age.toString()
+                    )
+
+                    etWeight.setText(
+                        profile.weightKg.toString()
+                    )
+
+                    etHeight.setText(
+                        profile.heightCm.toString()
+                    )
+
+                    setSpinnerValue(
+                        spGender,
+                        profile.gender
+                    )
+
+                    setSpinnerValue(
+                        spActivity,
+                        profile.activityLevel
+                    )
+
+                    setSpinnerValue(
+                        spGoal,
+                        profile.goal
+                    )
+                }
             }
         }
     }
+
+    // ==========================================
+    // SET SPINNER VALUE
+    // ==========================================
 
     private fun setSpinnerValue(
         spinner: Spinner,
         value: String
     ) {
 
-        val adapter = spinner.adapter
+        val adapter =
+            spinner.adapter
+                ?: return
 
         for (i in 0 until adapter.count) {
-            if (adapter.getItem(i).toString()
-                    .equals(value, ignoreCase = true)
+
+            val item =
+                adapter.getItem(i)
+                    ?.toString()
+                    ?: continue
+
+            if (
+                item.equals(
+                    value,
+                    ignoreCase = true
+                )
             ) {
+
                 spinner.setSelection(i)
+
                 break
             }
         }
     }
 
+    // ==========================================
+    // SAVE PROFILE
+    // ==========================================
+
     private fun saveProfile() {
 
-        val age = etAge.text.toString().toIntOrNull()
-        val weight = etWeight.text.toString().toDoubleOrNull()
-        val height = etHeight.text.toString().toDoubleOrNull()
+        val name =
+            etName.text
+                .toString()
+                .trim()
 
-        if (age == null || weight == null || height == null) {
+        val age =
+            etAge.text
+                .toString()
+                .toIntOrNull()
 
-            Toast.makeText(
-                this,
-                "Please enter valid age, weight and height",
-                Toast.LENGTH_SHORT
-            ).show()
+        val weight =
+            etWeight.text
+                .toString()
+                .toDoubleOrNull()
+
+        val height =
+            etHeight.text
+                .toString()
+                .toDoubleOrNull()
+
+        // ==========================================
+        // VALIDATION
+        // ==========================================
+
+        if (name.isEmpty()) {
+
+            etName.error =
+                "Please enter your name"
+
+            etName.requestFocus()
 
             return
         }
 
-        val profile = UserProfile(
-            id = 1,
-            age = age,
-            gender = spGender.selectedItem.toString(),
-            weightKg = weight,
-            heightCm = height,
-            activityLevel = spActivity.selectedItem.toString(),
-            goal = spGoal.selectedItem.toString()
-        )
+        if (age == null) {
+
+            etAge.error =
+                "Please enter valid age"
+
+            etAge.requestFocus()
+
+            return
+        }
+
+        if (weight == null) {
+
+            etWeight.error =
+                "Please enter valid weight"
+
+            etWeight.requestFocus()
+
+            return
+        }
+
+        if (height == null) {
+
+            etHeight.error =
+                "Please enter valid height"
+
+            etHeight.requestFocus()
+
+            return
+        }
+
+        // ==========================================
+        // PROFILE OBJECT
+        // ==========================================
+
+        val profile =
+            UserProfile(
+                id = 1,
+                name = name,
+                age = age,
+                gender =
+                    spGender.selectedItem
+                        .toString(),
+                weightKg = weight,
+                heightCm = height,
+                activityLevel =
+                    spActivity.selectedItem
+                        .toString(),
+                goal =
+                    spGoal.selectedItem
+                        .toString()
+            )
+
+        // ==========================================
+        // SAVE TO DATABASE
+        // ==========================================
 
         lifecycleScope.launch {
 
             val existingProfile =
-                database.userProfileDao().getProfile()
+                database.userProfileDao()
+                    .getProfile()
 
             if (existingProfile == null) {
-                database.userProfileDao().insertProfile(profile)
+
+                database.userProfileDao()
+                    .insertProfile(
+                        profile
+                    )
+
             } else {
-                database.userProfileDao().updateProfile(profile)
+
+                database.userProfileDao()
+                    .updateProfile(
+                        profile
+                    )
             }
 
             runOnUiThread {
 
                 Toast.makeText(
                     this@ProfileActivity,
-                    "Profile saved successfully!",
+                    "Profile saved successfully! ✅",
                     Toast.LENGTH_SHORT
                 ).show()
 

@@ -3,7 +3,7 @@ package com.example.dailyhabittracker
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.Button
+import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -16,7 +16,7 @@ class AddFoodActivity : AppCompatActivity() {
 
     private lateinit var etFoodName: EditText
     private lateinit var etQuantity: EditText
-    private lateinit var btnSaveFood: Button
+    private lateinit var btnSaveFood: View
     private lateinit var tvNutritionPreview: TextView
 
     private lateinit var database: HabitDatabase
@@ -334,20 +334,44 @@ class AddFoodActivity : AppCompatActivity() {
         "मह" to "Honey"
     )
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_add_food)
+        setContentView(
+            R.layout.activity_add_food
+        )
 
-        etFoodName = findViewById(R.id.etFoodName)
-        etQuantity = findViewById(R.id.etQuantity)
-        btnSaveFood = findViewById(R.id.btnSaveFood)
-        tvNutritionPreview = findViewById(R.id.tvNutritionPreview)
+        // ==========================================
+        // FIND VIEWS
+        // ==========================================
 
-        database = HabitDatabase.getDatabase(this)
+        etFoodName =
+            findViewById(R.id.etFoodName)
 
-        // Save button disabled until database is ready
+        etQuantity =
+            findViewById(R.id.etQuantity)
+
+        btnSaveFood =
+            findViewById(R.id.btnSaveFood)
+
+        tvNutritionPreview =
+            findViewById(R.id.tvNutritionPreview)
+
+        // ==========================================
+        // DATABASE
+        // ==========================================
+
+        database =
+            HabitDatabase.getDatabase(this)
+
+        // Disable Save until food database is ready
         btnSaveFood.isEnabled = false
+
+        // ==========================================
+        // LOAD DEFAULT FOODS
+        // ==========================================
 
         lifecycleScope.launch {
 
@@ -364,23 +388,50 @@ class AddFoodActivity : AppCompatActivity() {
             }
         }
 
+        // ==========================================
+        // SAVE FOOD
+        // ==========================================
+
         btnSaveFood.setOnClickListener {
 
             val enteredName =
-                etFoodName.text.toString().trim()
+                etFoodName.text
+                    .toString()
+                    .trim()
 
             val quantity =
-                etQuantity.text.toString().toDoubleOrNull()
+                etQuantity.text
+                    .toString()
+                    .toDoubleOrNull()
+
+            // ------------------------------------------
+            // VALIDATE FOOD NAME
+            // ------------------------------------------
 
             if (enteredName.isEmpty()) {
 
-                etFoodName.error = "Enter food name"
+                etFoodName.error =
+                    "Enter food name"
+
+                etFoodName.requestFocus()
+
                 return@setOnClickListener
             }
 
-            if (quantity == null || quantity <= 0) {
+            // ------------------------------------------
+            // VALIDATE QUANTITY
+            // ------------------------------------------
 
-                etQuantity.error = "Enter valid quantity"
+            if (
+                quantity == null ||
+                quantity <= 0
+            ) {
+
+                etQuantity.error =
+                    "Enter valid quantity"
+
+                etQuantity.requestFocus()
+
                 return@setOnClickListener
             }
 
@@ -389,23 +440,34 @@ class AddFoodActivity : AppCompatActivity() {
                 val searchName =
                     enteredName.lowercase()
 
-                /*
-                 * Check aliases first.
-                 */
+                // ------------------------------------------
+                // FIND CANONICAL NAME
+                // ------------------------------------------
+
                 val canonicalName =
                     foodAliases[searchName]
                         ?: enteredName
 
+                // ------------------------------------------
+                // GET FOOD DATABASE
+                // ------------------------------------------
+
                 val foods =
-                    database.foodDao().getAllFoods()
+                    database.foodDao()
+                        .getAllFoods()
 
                 val food =
                     foods.firstOrNull {
+
                         it.name.equals(
                             canonicalName,
                             ignoreCase = true
                         )
                     }
+
+                // ------------------------------------------
+                // FOOD NOT FOUND
+                // ------------------------------------------
 
                 if (food == null) {
 
@@ -421,46 +483,65 @@ class AddFoodActivity : AppCompatActivity() {
                     return@launch
                 }
 
-                // Nutrition values are stored per 100g
+                // ------------------------------------------
+                // CALCULATE NUTRITION
+                // ------------------------------------------
+
                 val multiplier =
                     quantity / 100.0
 
                 val entry =
                     NutritionEntry(
                         foodName = food.name,
+
                         quantity = quantity,
+
                         unit = "g",
 
                         calories =
-                            food.calories * multiplier,
+                            food.calories *
+                                    multiplier,
 
                         protein =
-                            food.protein * multiplier,
+                            food.protein *
+                                    multiplier,
 
                         carbohydrates =
-                            food.carbohydrates * multiplier,
+                            food.carbohydrates *
+                                    multiplier,
 
                         fat =
-                            food.fat * multiplier,
+                            food.fat *
+                                    multiplier,
 
                         fiber =
-                            food.fiber * multiplier,
+                            food.fiber *
+                                    multiplier,
 
                         vitaminA =
-                            food.vitaminA * multiplier,
+                            food.vitaminA *
+                                    multiplier,
 
                         vitaminC =
-                            food.vitaminC * multiplier,
+                            food.vitaminC *
+                                    multiplier,
 
                         calcium =
-                            food.calcium * multiplier,
+                            food.calcium *
+                                    multiplier,
 
                         iron =
-                            food.iron * multiplier,
+                            food.iron *
+                                    multiplier,
 
                         date =
-                            LocalDate.now().toString()
+                            LocalDate.now()
+                                .toString()
                     )
+
+                // ------------------------------------------
+                // SAVE ENTRY
+                // ------------------------------------------
 
                 database.nutritionDao()
                     .insertEntry(entry)
@@ -479,52 +560,68 @@ class AddFoodActivity : AppCompatActivity() {
         }
     }
 
-    /*
-     * Live nutrition preview
-     */
+    // ==========================================
+    // LIVE NUTRITION PREVIEW
+    // ==========================================
+
     private fun setupNutritionPreview() {
 
-        val textWatcher = object : TextWatcher {
+        val textWatcher =
+            object : TextWatcher {
 
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int
+                ) {
+                    updateNutritionPreview()
+                }
+
+                override fun afterTextChanged(
+                    s: Editable?
+                ) {
+                }
             }
 
-            override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-                updateNutritionPreview()
-            }
+        etFoodName.addTextChangedListener(
+            textWatcher
+        )
 
-            override fun afterTextChanged(
-                s: Editable?
-            ) {
-            }
-        }
-
-        etFoodName.addTextChangedListener(textWatcher)
-        etQuantity.addTextChangedListener(textWatcher)
+        etQuantity.addTextChangedListener(
+            textWatcher
+        )
     }
 
-    /*
-     * Calculate and display nutrition automatically
-     */
+    // ==========================================
+    // UPDATE NUTRITION PREVIEW
+    // ==========================================
+
     private fun updateNutritionPreview() {
 
         lifecycleScope.launch {
 
             val enteredName =
-                etFoodName.text.toString().trim()
+                etFoodName.text
+                    .toString()
+                    .trim()
 
             val quantity =
-                etQuantity.text.toString().toDoubleOrNull()
+                etQuantity.text
+                    .toString()
+                    .toDoubleOrNull()
+
+            // ------------------------------------------
+            // EMPTY INPUT
+            // ------------------------------------------
 
             if (
                 enteredName.isEmpty() ||
@@ -541,62 +638,94 @@ class AddFoodActivity : AppCompatActivity() {
                 return@launch
             }
 
+            // ------------------------------------------
+            // CANONICAL NAME
+            // ------------------------------------------
+
             val canonicalName =
-                foodAliases[enteredName.lowercase()]
-                    ?: enteredName
+                foodAliases[
+                    enteredName.lowercase()
+                ] ?: enteredName
+
+            // ------------------------------------------
+            // FIND FOOD
+            // ------------------------------------------
 
             val foods =
-                database.foodDao().getAllFoods()
+                database.foodDao()
+                    .getAllFoods()
 
             val food =
                 foods.firstOrNull {
+
                     it.name.equals(
                         canonicalName,
                         ignoreCase = true
                     )
                 }
 
+            // ------------------------------------------
+            // FOOD NOT FOUND
+            // ------------------------------------------
+
             if (food == null) {
 
                 runOnUiThread {
 
                     tvNutritionPreview.text =
-                        "❌ Food not found\n\nTry: Rice, Dal, Roti, Apple, Banana..."
+                        "❌ Food not found\n\n" +
+                                "Try: Rice, Dal, Roti, Apple, Banana..."
                 }
 
                 return@launch
             }
 
-            // All food values are based on 100g
+            // ------------------------------------------
+            // CALCULATE
+            // ------------------------------------------
+
             val multiplier =
                 quantity / 100.0
 
             val calories =
-                food.calories * multiplier
+                food.calories *
+                        multiplier
 
             val protein =
-                food.protein * multiplier
+                food.protein *
+                        multiplier
 
             val carbohydrates =
-                food.carbohydrates * multiplier
+                food.carbohydrates *
+                        multiplier
 
             val fat =
-                food.fat * multiplier
+                food.fat *
+                        multiplier
 
             val fiber =
-                food.fiber * multiplier
+                food.fiber *
+                        multiplier
 
             val vitaminA =
-                food.vitaminA * multiplier
+                food.vitaminA *
+                        multiplier
 
             val vitaminC =
-                food.vitaminC * multiplier
+                food.vitaminC *
+                        multiplier
 
             val calcium =
-                food.calcium * multiplier
+                food.calcium *
+                        multiplier
 
             val iron =
-                food.iron * multiplier
+                food.iron *
+                        multiplier
+
+            // ==========================================
+            // DISPLAY PREVIEW
+            // ==========================================
 
             runOnUiThread {
 
@@ -619,503 +748,514 @@ class AddFoodActivity : AppCompatActivity() {
         }
     }
 
+    // ==========================================
+    // DEFAULT FOOD DATABASE
+    // ==========================================
+
     private suspend fun addDefaultFoods() {
 
         val existingFoods =
-            database.foodDao().getAllFoods()
+            database.foodDao()
+                .getAllFoods()
 
-        val defaultFoods = listOf(
+        val defaultFoods =
+            listOf(
 
-            FoodItem(
-                name = "Rice",
-                calories = 130.0,
-                protein = 2.7,
-                carbohydrates = 28.2,
-                fat = 0.3,
-                fiber = 0.4,
-                calcium = 10.0,
-                iron = 0.2
-            ),
+                FoodItem(
+                    name = "Rice",
+                    calories = 130.0,
+                    protein = 2.7,
+                    carbohydrates = 28.2,
+                    fat = 0.3,
+                    fiber = 0.4,
+                    calcium = 10.0,
+                    iron = 0.2
+                ),
 
-            FoodItem(
-                name = "Milk",
-                calories = 61.0,
-                protein = 3.2,
-                carbohydrates = 4.8,
-                fat = 3.3,
-                vitaminA = 46.0,
-                calcium = 113.0
-            ),
+                FoodItem(
+                    name = "Milk",
+                    calories = 61.0,
+                    protein = 3.2,
+                    carbohydrates = 4.8,
+                    fat = 3.3,
+                    vitaminA = 46.0,
+                    calcium = 113.0
+                ),
 
-            FoodItem(
-                name = "Chicken",
-                calories = 165.0,
-                protein = 31.0,
-                fat = 3.6,
-                vitaminA = 13.0,
-                calcium = 15.0,
-                iron = 1.0
-            ),
+                FoodItem(
+                    name = "Chicken",
+                    calories = 165.0,
+                    protein = 31.0,
+                    fat = 3.6,
+                    vitaminA = 13.0,
+                    calcium = 15.0,
+                    iron = 1.0
+                ),
 
-            FoodItem(
-                name = "Egg",
-                calories = 155.0,
-                protein = 13.0,
-                carbohydrates = 1.1,
-                fat = 11.0,
-                vitaminA = 160.0,
-                calcium = 50.0,
-                iron = 1.2
-            ),
+                FoodItem(
+                    name = "Egg",
+                    calories = 155.0,
+                    protein = 13.0,
+                    carbohydrates = 1.1,
+                    fat = 11.0,
+                    vitaminA = 160.0,
+                    calcium = 50.0,
+                    iron = 1.2
+                ),
 
-            FoodItem(
-                name = "Banana",
-                calories = 89.0,
-                protein = 1.1,
-                carbohydrates = 22.8,
-                fat = 0.3,
-                fiber = 2.6,
-                vitaminA = 3.0,
-                vitaminC = 8.7,
-                calcium = 5.0,
-                iron = 0.3
-            ),
+                FoodItem(
+                    name = "Banana",
+                    calories = 89.0,
+                    protein = 1.1,
+                    carbohydrates = 22.8,
+                    fat = 0.3,
+                    fiber = 2.6,
+                    vitaminA = 3.0,
+                    vitaminC = 8.7,
+                    calcium = 5.0,
+                    iron = 0.3
+                ),
 
-            FoodItem(
-                name = "Roti",
-                calories = 297.0,
-                protein = 11.0,
-                carbohydrates = 55.0,
-                fat = 4.0,
-                fiber = 11.0,
-                iron = 3.0
-            ),
+                FoodItem(
+                    name = "Roti",
+                    calories = 297.0,
+                    protein = 11.0,
+                    carbohydrates = 55.0,
+                    fat = 4.0,
+                    fiber = 11.0,
+                    iron = 3.0
+                ),
 
-            FoodItem(
-                name = "Dal",
-                calories = 116.0,
-                protein = 9.0,
-                carbohydrates = 20.0,
-                fat = 0.4,
-                fiber = 7.9,
-                iron = 3.3
-            ),
+                FoodItem(
+                    name = "Dal",
+                    calories = 116.0,
+                    protein = 9.0,
+                    carbohydrates = 20.0,
+                    fat = 0.4,
+                    fiber = 7.9,
+                    iron = 3.3
+                ),
 
-            FoodItem(
-                name = "Potato",
-                calories = 77.0,
-                protein = 2.0,
-                carbohydrates = 17.5,
-                fat = 0.1,
-                fiber = 2.2,
-                vitaminC = 19.7
-            ),
+                FoodItem(
+                    name = "Potato",
+                    calories = 77.0,
+                    protein = 2.0,
+                    carbohydrates = 17.5,
+                    fat = 0.1,
+                    fiber = 2.2,
+                    vitaminC = 19.7
+                ),
 
-            FoodItem(
-                name = "Onion",
-                calories = 40.0,
-                protein = 1.1,
-                carbohydrates = 9.3,
-                fat = 0.1,
-                fiber = 1.7,
-                vitaminC = 7.4
-            ),
+                FoodItem(
+                    name = "Onion",
+                    calories = 40.0,
+                    protein = 1.1,
+                    carbohydrates = 9.3,
+                    fat = 0.1,
+                    fiber = 1.7,
+                    vitaminC = 7.4
+                ),
 
-            FoodItem(
-                name = "Tomato",
-                calories = 18.0,
-                protein = 0.9,
-                carbohydrates = 3.9,
-                fat = 0.2,
-                fiber = 1.2,
-                vitaminA = 42.0,
-                vitaminC = 13.7
-            ),
+                FoodItem(
+                    name = "Tomato",
+                    calories = 18.0,
+                    protein = 0.9,
+                    carbohydrates = 3.9,
+                    fat = 0.2,
+                    fiber = 1.2,
+                    vitaminA = 42.0,
+                    vitaminC = 13.7
+                ),
 
-            FoodItem(
-                name = "Curd",
-                calories = 61.0,
-                protein = 3.5,
-                carbohydrates = 4.7,
-                fat = 3.3,
-                calcium = 121.0
-            ),
+                FoodItem(
+                    name = "Curd",
+                    calories = 61.0,
+                    protein = 3.5,
+                    carbohydrates = 4.7,
+                    fat = 3.3,
+                    calcium = 121.0
+                ),
 
-            FoodItem(
-                name = "Apple",
-                calories = 52.0,
-                protein = 0.3,
-                carbohydrates = 13.8,
-                fat = 0.2,
-                fiber = 2.4,
-                vitaminC = 4.6
-            ),
+                FoodItem(
+                    name = "Apple",
+                    calories = 52.0,
+                    protein = 0.3,
+                    carbohydrates = 13.8,
+                    fat = 0.2,
+                    fiber = 2.4,
+                    vitaminC = 4.6
+                ),
 
-            FoodItem(
-                name = "Orange",
-                calories = 47.0,
-                protein = 0.9,
-                carbohydrates = 11.8,
-                fat = 0.1,
-                fiber = 2.4,
-                vitaminC = 53.2
-            ),
+                FoodItem(
+                    name = "Orange",
+                    calories = 47.0,
+                    protein = 0.9,
+                    carbohydrates = 11.8,
+                    fat = 0.1,
+                    fiber = 2.4,
+                    vitaminC = 53.2
+                ),
 
-            FoodItem(
-                name = "Mango",
-                calories = 60.0,
-                protein = 0.8,
-                carbohydrates = 15.0,
-                fat = 0.4,
-                fiber = 1.6,
-                vitaminA = 54.0,
-                vitaminC = 36.4
-            ),
+                FoodItem(
+                    name = "Mango",
+                    calories = 60.0,
+                    protein = 0.8,
+                    carbohydrates = 15.0,
+                    fat = 0.4,
+                    fiber = 1.6,
+                    vitaminA = 54.0,
+                    vitaminC = 36.4
+                ),
 
-            FoodItem(
-                name = "Guava",
-                calories = 68.0,
-                protein = 2.6,
-                carbohydrates = 14.3,
-                fat = 1.0,
-                fiber = 5.4,
-                vitaminC = 228.0
-            ),
+                FoodItem(
+                    name = "Guava",
+                    calories = 68.0,
+                    protein = 2.6,
+                    carbohydrates = 14.3,
+                    fat = 1.0,
+                    fiber = 5.4,
+                    vitaminC = 228.0
+                ),
 
-            FoodItem(
-                name = "Papaya",
-                calories = 43.0,
-                protein = 0.5,
-                carbohydrates = 10.8,
-                fat = 0.3,
-                fiber = 1.7,
-                vitaminA = 47.0,
-                vitaminC = 60.9
-            ),
+                FoodItem(
+                    name = "Papaya",
+                    calories = 43.0,
+                    protein = 0.5,
+                    carbohydrates = 10.8,
+                    fat = 0.3,
+                    fiber = 1.7,
+                    vitaminA = 47.0,
+                    vitaminC = 60.9
+                ),
 
-            FoodItem(
-                name = "Pomegranate",
-                calories = 83.0,
-                protein = 1.7,
-                carbohydrates = 18.7,
-                fat = 1.2,
-                fiber = 4.0,
-                vitaminC = 10.2
-            ),
+                FoodItem(
+                    name = "Pomegranate",
+                    calories = 83.0,
+                    protein = 1.7,
+                    carbohydrates = 18.7,
+                    fat = 1.2,
+                    fiber = 4.0,
+                    vitaminC = 10.2
+                ),
 
-            FoodItem(
-                name = "Watermelon",
-                calories = 30.0,
-                protein = 0.6,
-                carbohydrates = 7.6,
-                fat = 0.2,
-                fiber = 0.4,
-                vitaminA = 28.0,
-                vitaminC = 8.1
-            ),
+                FoodItem(
+                    name = "Watermelon",
+                    calories = 30.0,
+                    protein = 0.6,
+                    carbohydrates = 7.6,
+                    fat = 0.2,
+                    fiber = 0.4,
+                    vitaminA = 28.0,
+                    vitaminC = 8.1
+                ),
 
-            FoodItem(
-                name = "Cucumber",
-                calories = 15.0,
-                protein = 0.7,
-                carbohydrates = 3.6,
-                fat = 0.1,
-                fiber = 0.5,
-                vitaminC = 2.8
-            ),
+                FoodItem(
+                    name = "Cucumber",
+                    calories = 15.0,
+                    protein = 0.7,
+                    carbohydrates = 3.6,
+                    fat = 0.1,
+                    fiber = 0.5,
+                    vitaminC = 2.8
+                ),
 
-            FoodItem(
-                name = "Carrot",
-                calories = 41.0,
-                protein = 0.9,
-                carbohydrates = 9.6,
-                fat = 0.2,
-                fiber = 2.8,
-                vitaminA = 835.0,
-                vitaminC = 5.9
-            ),
+                FoodItem(
+                    name = "Carrot",
+                    calories = 41.0,
+                    protein = 0.9,
+                    carbohydrates = 9.6,
+                    fat = 0.2,
+                    fiber = 2.8,
+                    vitaminA = 835.0,
+                    vitaminC = 5.9
+                ),
 
-            FoodItem(
-                name = "Spinach",
-                calories = 23.0,
-                protein = 2.9,
-                carbohydrates = 3.6,
-                fat = 0.4,
-                fiber = 2.2,
-                vitaminA = 469.0,
-                vitaminC = 28.1,
-                calcium = 99.0,
-                iron = 2.7
-            ),
+                FoodItem(
+                    name = "Spinach",
+                    calories = 23.0,
+                    protein = 2.9,
+                    carbohydrates = 3.6,
+                    fat = 0.4,
+                    fiber = 2.2,
+                    vitaminA = 469.0,
+                    vitaminC = 28.1,
+                    calcium = 99.0,
+                    iron = 2.7
+                ),
 
-            FoodItem(
-                name = "Mustard Greens",
-                calories = 27.0,
-                protein = 2.9,
-                carbohydrates = 4.7,
-                fat = 0.4,
-                fiber = 3.2,
-                vitaminA = 302.0,
-                vitaminC = 70.0,
-                calcium = 115.0,
-                iron = 1.6
-            ),
+                FoodItem(
+                    name = "Mustard Greens",
+                    calories = 27.0,
+                    protein = 2.9,
+                    carbohydrates = 4.7,
+                    fat = 0.4,
+                    fiber = 3.2,
+                    vitaminA = 302.0,
+                    vitaminC = 70.0,
+                    calcium = 115.0,
+                    iron = 1.6
+                ),
 
-            FoodItem(
-                name = "Cauliflower",
-                calories = 25.0,
-                protein = 1.9,
-                carbohydrates = 5.0,
-                fat = 0.3,
-                fiber = 2.0,
-                vitaminC = 48.2,
-                calcium = 22.0
-            ),
+                FoodItem(
+                    name = "Cauliflower",
+                    calories = 25.0,
+                    protein = 1.9,
+                    carbohydrates = 5.0,
+                    fat = 0.3,
+                    fiber = 2.0,
+                    vitaminC = 48.2,
+                    calcium = 22.0
+                ),
 
-            FoodItem(
-                name = "Cabbage",
-                calories = 25.0,
-                protein = 1.3,
-                carbohydrates = 5.8,
-                fat = 0.1,
-                fiber = 2.5,
-                vitaminC = 36.6
-            ),
+                FoodItem(
+                    name = "Cabbage",
+                    calories = 25.0,
+                    protein = 1.3,
+                    carbohydrates = 5.8,
+                    fat = 0.1,
+                    fiber = 2.5,
+                    vitaminC = 36.6
+                ),
 
-            FoodItem(
-                name = "Green Peas",
-                calories = 81.0,
-                protein = 5.4,
-                carbohydrates = 14.5,
-                fat = 0.4,
-                fiber = 5.7,
-                vitaminC = 40.0,
-                iron = 1.5
-            ),
+                FoodItem(
+                    name = "Green Peas",
+                    calories = 81.0,
+                    protein = 5.4,
+                    carbohydrates = 14.5,
+                    fat = 0.4,
+                    fiber = 5.7,
+                    vitaminC = 40.0,
+                    iron = 1.5
+                ),
 
-            FoodItem(
-                name = "Chickpeas",
-                calories = 164.0,
-                protein = 8.9,
-                carbohydrates = 27.4,
-                fat = 2.6,
-                fiber = 7.6,
-                iron = 2.9
-            ),
+                FoodItem(
+                    name = "Chickpeas",
+                    calories = 164.0,
+                    protein = 8.9,
+                    carbohydrates = 27.4,
+                    fat = 2.6,
+                    fiber = 7.6,
+                    iron = 2.9
+                ),
 
-            FoodItem(
-                name = "Black Gram",
-                calories = 341.0,
-                protein = 25.0,
-                carbohydrates = 59.0,
-                fat = 1.6,
-                fiber = 18.0,
-                iron = 7.6
-            ),
+                FoodItem(
+                    name = "Black Gram",
+                    calories = 341.0,
+                    protein = 25.0,
+                    carbohydrates = 59.0,
+                    fat = 1.6,
+                    fiber = 18.0,
+                    iron = 7.6
+                ),
 
-            FoodItem(
-                name = "Kidney Beans",
-                calories = 127.0,
-                protein = 8.7,
-                carbohydrates = 22.8,
-                fat = 0.5,
-                fiber = 6.4,
-                iron = 2.9
-            ),
+                FoodItem(
+                    name = "Kidney Beans",
+                    calories = 127.0,
+                    protein = 8.7,
+                    carbohydrates = 22.8,
+                    fat = 0.5,
+                    fiber = 6.4,
+                    iron = 2.9
+                ),
 
-            FoodItem(
-                name = "Soybean",
-                calories = 173.0,
-                protein = 16.6,
-                carbohydrates = 9.9,
-                fat = 9.0,
-                fiber = 6.0,
-                iron = 5.1
-            ),
+                FoodItem(
+                    name = "Soybean",
+                    calories = 173.0,
+                    protein = 16.6,
+                    carbohydrates = 9.9,
+                    fat = 9.0,
+                    fiber = 6.0,
+                    iron = 5.1
+                ),
 
-            FoodItem(
-                name = "Paneer",
-                calories = 265.0,
-                protein = 18.3,
-                carbohydrates = 6.1,
-                fat = 20.8,
-                calcium = 208.0
-            ),
+                FoodItem(
+                    name = "Paneer",
+                    calories = 265.0,
+                    protein = 18.3,
+                    carbohydrates = 6.1,
+                    fat = 20.8,
+                    calcium = 208.0
+                ),
 
-            FoodItem(
-                name = "Tofu",
-                calories = 76.0,
-                protein = 8.0,
-                carbohydrates = 1.9,
-                fat = 4.8,
-                calcium = 350.0,
-                iron = 5.4
-            ),
+                FoodItem(
+                    name = "Tofu",
+                    calories = 76.0,
+                    protein = 8.0,
+                    carbohydrates = 1.9,
+                    fat = 4.8,
+                    calcium = 350.0,
+                    iron = 5.4
+                ),
 
-            FoodItem(
-                name = "Peanuts",
-                calories = 567.0,
-                protein = 25.8,
-                carbohydrates = 16.1,
-                fat = 49.2,
-                fiber = 8.5,
-                calcium = 92.0,
-                iron = 4.6
-            ),
+                FoodItem(
+                    name = "Peanuts",
+                    calories = 567.0,
+                    protein = 25.8,
+                    carbohydrates = 16.1,
+                    fat = 49.2,
+                    fiber = 8.5,
+                    calcium = 92.0,
+                    iron = 4.6
+                ),
 
-            FoodItem(
-                name = "Almonds",
-                calories = 579.0,
-                protein = 21.2,
-                carbohydrates = 21.6,
-                fat = 49.9,
-                fiber = 12.5,
-                calcium = 269.0,
-                iron = 3.7
-            ),
+                FoodItem(
+                    name = "Almonds",
+                    calories = 579.0,
+                    protein = 21.2,
+                    carbohydrates = 21.6,
+                    fat = 49.9,
+                    fiber = 12.5,
+                    calcium = 269.0,
+                    iron = 3.7
+                ),
 
-            FoodItem(
-                name = "Cashews",
-                calories = 553.0,
-                protein = 18.2,
-                carbohydrates = 30.2,
-                fat = 43.8,
-                fiber = 3.3,
-                calcium = 37.0,
-                iron = 6.7
-            ),
+                FoodItem(
+                    name = "Cashews",
+                    calories = 553.0,
+                    protein = 18.2,
+                    carbohydrates = 30.2,
+                    fat = 43.8,
+                    fiber = 3.3,
+                    calcium = 37.0,
+                    iron = 6.7
+                ),
 
-            FoodItem(
-                name = "Walnuts",
-                calories = 654.0,
-                protein = 15.2,
-                carbohydrates = 13.7,
-                fat = 65.2,
-                fiber = 6.7,
-                calcium = 98.0,
-                iron = 2.9
-            ),
+                FoodItem(
+                    name = "Walnuts",
+                    calories = 654.0,
+                    protein = 15.2,
+                    carbohydrates = 13.7,
+                    fat = 65.2,
+                    fiber = 6.7,
+                    calcium = 98.0,
+                    iron = 2.9
+                ),
 
-            FoodItem(
-                name = "Oats",
-                calories = 389.0,
-                protein = 16.9,
-                carbohydrates = 66.3,
-                fat = 6.9,
-                fiber = 10.6,
-                iron = 4.7
-            ),
+                FoodItem(
+                    name = "Oats",
+                    calories = 389.0,
+                    protein = 16.9,
+                    carbohydrates = 66.3,
+                    fat = 6.9,
+                    fiber = 10.6,
+                    iron = 4.7
+                ),
 
-            FoodItem(
-                name = "Bread",
-                calories = 265.0,
-                protein = 9.0,
-                carbohydrates = 49.0,
-                fat = 3.2,
-                fiber = 2.7,
-                iron = 3.6
-            ),
+                FoodItem(
+                    name = "Bread",
+                    calories = 265.0,
+                    protein = 9.0,
+                    carbohydrates = 49.0,
+                    fat = 3.2,
+                    fiber = 2.7,
+                    iron = 3.6
+                ),
 
-            FoodItem(
-                name = "Poha",
-                calories = 130.0,
-                protein = 2.4,
-                carbohydrates = 27.0,
-                fat = 1.0,
-                fiber = 1.5
-            ),
+                FoodItem(
+                    name = "Poha",
+                    calories = 130.0,
+                    protein = 2.4,
+                    carbohydrates = 27.0,
+                    fat = 1.0,
+                    fiber = 1.5
+                ),
 
-            FoodItem(
-                name = "Upma",
-                calories = 150.0,
-                protein = 3.5,
-                carbohydrates = 25.0,
-                fat = 4.0,
-                fiber = 2.0
-            ),
+                FoodItem(
+                    name = "Upma",
+                    calories = 150.0,
+                    protein = 3.5,
+                    carbohydrates = 25.0,
+                    fat = 4.0,
+                    fiber = 2.0
+                ),
 
-            FoodItem(
-                name = "Idli",
-                calories = 58.0,
-                protein = 2.0,
-                carbohydrates = 12.0,
-                fat = 0.4,
-                fiber = 0.8
-            ),
+                FoodItem(
+                    name = "Idli",
+                    calories = 58.0,
+                    protein = 2.0,
+                    carbohydrates = 12.0,
+                    fat = 0.4,
+                    fiber = 0.8
+                ),
 
-            FoodItem(
-                name = "Dosa",
-                calories = 168.0,
-                protein = 3.9,
-                carbohydrates = 29.0,
-                fat = 3.7,
-                fiber = 1.0
-            ),
+                FoodItem(
+                    name = "Dosa",
+                    calories = 168.0,
+                    protein = 3.9,
+                    carbohydrates = 29.0,
+                    fat = 3.7,
+                    fiber = 1.0
+                ),
 
-            FoodItem(
-                name = "Samosa",
-                calories = 262.0,
-                protein = 5.0,
-                carbohydrates = 31.0,
-                fat = 13.0,
-                fiber = 2.0
-            ),
+                FoodItem(
+                    name = "Samosa",
+                    calories = 262.0,
+                    protein = 5.0,
+                    carbohydrates = 31.0,
+                    fat = 13.0,
+                    fiber = 2.0
+                ),
 
-            FoodItem(
-                name = "Momo",
-                calories = 200.0,
-                protein = 8.0,
-                carbohydrates = 25.0,
-                fat = 7.0
-            ),
+                FoodItem(
+                    name = "Momo",
+                    calories = 200.0,
+                    protein = 8.0,
+                    carbohydrates = 25.0,
+                    fat = 7.0
+                ),
 
-            FoodItem(
-                name = "Thukpa",
-                calories = 90.0,
-                protein = 4.0,
-                carbohydrates = 12.0,
-                fat = 3.0
-            ),
+                FoodItem(
+                    name = "Thukpa",
+                    calories = 90.0,
+                    protein = 4.0,
+                    carbohydrates = 12.0,
+                    fat = 3.0
+                ),
 
-            FoodItem(
-                name = "Dal Bhat",
-                calories = 150.0,
-                protein = 5.0,
-                carbohydrates = 27.0,
-                fat = 2.0,
-                fiber = 3.0
-            ),
+                FoodItem(
+                    name = "Dal Bhat",
+                    calories = 150.0,
+                    protein = 5.0,
+                    carbohydrates = 27.0,
+                    fat = 2.0,
+                    fiber = 3.0
+                ),
 
-            FoodItem(
-                name = "Ghee",
-                calories = 900.0,
-                fat = 100.0
-            ),
+                FoodItem(
+                    name = "Ghee",
+                    calories = 900.0,
+                    fat = 100.0
+                ),
 
-            FoodItem(
-                name = "Mustard Oil",
-                calories = 884.0,
-                fat = 100.0
-            ),
+                FoodItem(
+                    name = "Mustard Oil",
+                    calories = 884.0,
+                    fat = 100.0
+                ),
 
-            FoodItem(
-                name = "Sugar",
-                calories = 387.0,
-                carbohydrates = 100.0
-            ),
+                FoodItem(
+                    name = "Sugar",
+                    calories = 387.0,
+                    carbohydrates = 100.0
+                ),
 
-            FoodItem(
-                name = "Honey",
-                calories = 304.0,
-                protein = 0.3,
-                carbohydrates = 82.4
+                FoodItem(
+                    name = "Honey",
+                    calories = 304.0,
+                    protein = 0.3,
+                    carbohydrates = 82.4
+                )
             )
-        )
+
+        // ==========================================
+        // INSERT ONLY MISSING FOODS
+        // ==========================================
 
         defaultFoods.forEach { defaultFood ->
 
             val alreadyExists =
                 existingFoods.any {
+
                     it.name.equals(
                         defaultFood.name,
                         ignoreCase = true
@@ -1125,8 +1265,10 @@ class AddFoodActivity : AppCompatActivity() {
             if (!alreadyExists) {
 
                 database.foodDao()
-                    .insertFood(defaultFood)
+                    .insertFood(
+                        defaultFood
+                    )
             }
         }
     }
- }
+}

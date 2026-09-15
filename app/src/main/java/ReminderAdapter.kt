@@ -4,13 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Switch
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ReminderAdapter(
     private var reminders: List<Reminder>,
     private val onEditClick: (Reminder) -> Unit,
-    private val onDeleteClick: (Reminder) -> Unit
+    private val onDeleteClick: (Reminder) -> Unit,
+    private val onToggleClick: (Reminder, Boolean) -> Unit
 ) : RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder>() {
 
     class ReminderViewHolder(
@@ -22,6 +24,12 @@ class ReminderAdapter(
 
         val tvReminderMessage: TextView =
             itemView.findViewById(R.id.tvReminderMessage)
+
+        val tvReminderStatus: TextView =
+            itemView.findViewById(R.id.tvReminderStatus)
+
+        val switchReminder: Switch =
+            itemView.findViewById(R.id.switchReminder)
 
         val tvReminderMore: TextView =
             itemView.findViewById(R.id.tvReminderMore)
@@ -48,7 +56,8 @@ class ReminderAdapter(
         position: Int
     ) {
 
-        val reminder = reminders[position]
+        val reminder =
+            reminders[position]
 
         holder.tvReminderTime.text =
             "⏰ ${formatTime(reminder.time)}"
@@ -56,6 +65,30 @@ class ReminderAdapter(
         holder.tvReminderMessage.text =
             reminder.message
 
+        // Remove old listener before changing switch state
+        holder.switchReminder.setOnCheckedChangeListener(
+            null
+        )
+
+        holder.switchReminder.isChecked =
+            reminder.isEnabled
+
+        updateStatus(
+            holder,
+            reminder.isEnabled
+        )
+
+        // ON / OFF
+        holder.switchReminder.setOnCheckedChangeListener {
+                _, isChecked ->
+
+            onToggleClick(
+                reminder,
+                isChecked
+            )
+        }
+
+        // 3-dot menu
         holder.tvReminderMore.setOnClickListener {
 
             val popupMenu =
@@ -64,20 +97,31 @@ class ReminderAdapter(
                     holder.tvReminderMore
                 )
 
-            popupMenu.menu.add("✏️ Edit")
-            popupMenu.menu.add("🗑️ Delete")
+            popupMenu.menu.add(
+                "✏️ Edit"
+            )
+
+            popupMenu.menu.add(
+                "🗑️ Delete"
+            )
 
             popupMenu.setOnMenuItemClickListener { menuItem ->
 
-                when (menuItem.title.toString()) {
+                when (
+                    menuItem.title.toString()
+                ) {
 
                     "✏️ Edit" -> {
-                        onEditClick(reminder)
+                        onEditClick(
+                            reminder
+                        )
                         true
                     }
 
                     "🗑️ Delete" -> {
-                        onDeleteClick(reminder)
+                        onDeleteClick(
+                            reminder
+                        )
                         true
                     }
 
@@ -102,11 +146,37 @@ class ReminderAdapter(
         notifyDataSetChanged()
     }
 
+    private fun updateStatus(
+        holder: ReminderViewHolder,
+        isEnabled: Boolean
+    ) {
+
+        if (isEnabled) {
+
+            holder.tvReminderStatus.text =
+                "Daily • Alarm ON"
+
+            holder.tvReminderStatus.setTextColor(
+                0xFF3FA76A.toInt()
+            )
+
+        } else {
+
+            holder.tvReminderStatus.text =
+                "Daily • Alarm OFF"
+
+            holder.tvReminderStatus.setTextColor(
+                0xFF999999.toInt()
+            )
+        }
+    }
+
     private fun formatTime(
         time: String
     ): String {
 
-        val parts = time.split(":")
+        val parts =
+            time.split(":")
 
         if (parts.size != 2) {
             return time

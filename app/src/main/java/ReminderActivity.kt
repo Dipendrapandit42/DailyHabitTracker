@@ -7,15 +7,17 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Button
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.PopupMenu
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -23,11 +25,13 @@ class ReminderActivity : AppCompatActivity() {
 
     private lateinit var etReminderMessage: EditText
     private lateinit var tvSelectedTime: TextView
-    private lateinit var btnSelectTime: Button
-    private lateinit var btnSaveReminder: Button
-    private lateinit var recyclerViewReminders: RecyclerView
 
-    private lateinit var reminderAdapter: ReminderAdapter
+    private lateinit var btnSelectTime: View
+    private lateinit var btnSaveReminder: View
+
+    private lateinit var alarmListContainer: LinearLayout
+    private lateinit var tvNoAlarms: TextView
+
     private lateinit var database: HabitDatabase
 
     private var selectedHour = -1
@@ -38,41 +42,16 @@ class ReminderActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_reminder)
 
-        etReminderMessage =
-            findViewById(R.id.etReminderMessage)
+        etReminderMessage = findViewById(R.id.etReminderMessage)
+        tvSelectedTime = findViewById(R.id.tvSelectedTime)
 
-        tvSelectedTime =
-            findViewById(R.id.tvSelectedTime)
+        btnSelectTime = findViewById(R.id.btnSelectTime)
+        btnSaveReminder = findViewById(R.id.btnSaveReminder)
 
-        btnSelectTime =
-            findViewById(R.id.btnSelectTime)
+        alarmListContainer = findViewById(R.id.alarmListContainer)
+        tvNoAlarms = findViewById(R.id.tvNoAlarms)
 
-        btnSaveReminder =
-            findViewById(R.id.btnSaveReminder)
-
-        recyclerViewReminders =
-            findViewById(R.id.recyclerViewReminders)
-
-        database =
-            HabitDatabase.getDatabase(this)
-
-        reminderAdapter = ReminderAdapter(
-            emptyList(),
-
-            onEditClick = { reminder ->
-                editReminder(reminder)
-            },
-
-            onDeleteClick = { reminder ->
-                deleteReminder(reminder)
-            }
-        )
-
-        recyclerViewReminders.layoutManager =
-            LinearLayoutManager(this)
-
-        recyclerViewReminders.adapter =
-            reminderAdapter
+        database = HabitDatabase.getDatabase(this)
 
         btnSelectTime.setOnClickListener {
             showTimePicker()
@@ -87,67 +66,220 @@ class ReminderActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         loadReminders()
     }
+
+    // =========================================================
+    // LOAD REMINDERS
+    // =========================================================
 
     private fun loadReminders() {
 
         lifecycleScope.launch {
 
             val reminders =
-                database.reminderDao()
-                    .getAllReminders()
+                database.reminderDao().getAllReminders()
 
-            reminderAdapter.updateReminders(
-                reminders
-            )
+            runOnUiThread {
+                displayReminders(reminders)
+            }
         }
     }
+
+    // =========================================================
+    // DISPLAY ALL REMINDERS
+    // =========================================================
+
+    private fun displayReminders(
+        reminders: List<Reminder>
+    ) {
+
+        alarmListContainer.removeAllViews()
+
+        if (reminders.isEmpty()) {
+
+            tvNoAlarms.visibility = View.VISIBLE
+
+            return
+        }
+
+        tvNoAlarms.visibility = View.GONE
+
+        val inflater =
+            LayoutInflater.from(this)
+
+        reminders.forEach { reminder ->
+
+            val itemView =
+                inflater.inflate(
+                    R.layout.item_reminder,
+                    alarmListContainer,
+                    false
+                )
+
+            val tvReminderTime =
+                itemView.findViewById<TextView>(
+                    R.id.tvReminderTime
+                )
+
+            val tvReminderMessage =
+                itemView.findViewById<TextView>(
+                    R.id.tvReminderMessage
+                )
+
+            val tvReminderStatus =
+                itemView.findViewById<TextView>(
+                    R.id.tvReminderStatus
+                )
+
+            val switchReminder =
+                itemView.findViewById<Switch>(
+                    R.id.switchReminder
+                )
+
+            val tvReminderMore =
+                itemView.findViewById<TextView>(
+                    R.id.tvReminderMore
+                )
+
+            // Time
+            tvReminderTime.text =
+                "⏰ ${formatTimeForDisplay(reminder.time)}"
+
+            // Message
+            tvReminderMessage.text =
+                reminder.message
+
+            // Status
+            updateStatus(
+                tvReminderStatus,
+                reminder.isEnabled
+            )
+
+            // Switch
+            switchReminder.setOnCheckedChangeListener(null)
+
+            switchReminder.isChecked =
+                reminder.isEnabled
+
+            switchReminder.setOnCheckedChangeListener {
+                    _, isChecked ->
+
+                toggleReminder(
+                    reminder,
+                    isChecked
+                )
+            }
+
+            // More menu
+            tvReminderMore.setOnClickListener {
+
+                showReminderMenu(
+                    tvReminderMore,
+                    reminder
+                )
+            }
+
+            alarmListContainer.addView(itemView)
+        }
+    }
+
+    // =========================================================
+    // MORE MENU
+    // =========================================================
+
+    private fun showReminderMenu(
+        anchorView: View,
+        reminder: Reminder
+    ) {
+
+        val popupMenu =
+            PopupMenu(
+                this,
+                anchorView
+            )
+
+        popupMenu.menu.add(
+            "✏️ Edit"
+        )
+
+        popupMenu.menu.add(
+            "🗑️ Delete"
+        )
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+
+            when (
+                menuItem.title.toString()
+            ) {
+
+                "✏️ Edit" -> {
+
+                    editReminder(
+                        reminder
+                    )
+
+                    true
+                }
+
+                "🗑️ Delete" -> {
+
+                    deleteReminder(
+                        reminder
+                    )
+
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        popupMenu.show()
+    }
+
+    // =========================================================
+    // TIME PICKER
+    // =========================================================
 
     private fun showTimePicker() {
 
         val calendar =
             Calendar.getInstance()
 
-        val currentHour =
-            calendar.get(Calendar.HOUR_OF_DAY)
+        TimePickerDialog(
+            this,
 
-        val currentMinute =
-            calendar.get(Calendar.MINUTE)
+            { _, hourOfDay, minute ->
 
-        val timePickerDialog =
-            TimePickerDialog(
-                this,
-                { _, hourOfDay, minute ->
+                selectedHour = hourOfDay
+                selectedMinute = minute
 
-                    selectedHour =
-                        hourOfDay
-
-                    selectedMinute =
+                val formattedTime =
+                    String.format(
+                        "%02d:%02d",
+                        hourOfDay,
                         minute
+                    )
 
-                    val formattedTime =
-                        String.format(
-                            "%02d:%02d",
-                            selectedHour,
-                            selectedMinute
+                tvSelectedTime.text =
+                    "🕐 Selected Time: ${
+                        formatTimeForDisplay(
+                            formattedTime
                         )
+                    }"
+            },
 
-                    tvSelectedTime.text =
-                        "🕐 Selected Time: ${
-                            formatTimeForDisplay(
-                                formattedTime
-                            )
-                        }"
-                },
-                currentHour,
-                currentMinute,
-                false
-            )
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false
 
-        timePickerDialog.show()
+        ).show()
     }
+
+    // =========================================================
+    // SAVE NEW REMINDER
+    // =========================================================
 
     private fun saveReminder() {
 
@@ -160,6 +292,8 @@ class ReminderActivity : AppCompatActivity() {
 
             etReminderMessage.error =
                 "Enter alarm message"
+
+            etReminderMessage.requestFocus()
 
             return
         }
@@ -200,9 +334,7 @@ class ReminderActivity : AppCompatActivity() {
 
             val reminderId =
                 database.reminderDao()
-                    .insertReminder(
-                        reminder
-                    )
+                    .insertReminder(reminder)
 
             val savedReminder =
                 reminder.copy(
@@ -214,17 +346,104 @@ class ReminderActivity : AppCompatActivity() {
                 savedReminder
             )
 
-            Toast.makeText(
-                this@ReminderActivity,
-                "Alarm set successfully ⏰",
-                Toast.LENGTH_SHORT
-            ).show()
+            runOnUiThread {
 
-            clearForm()
+                Toast.makeText(
+                    this@ReminderActivity,
+                    "Alarm set successfully ⏰",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                clearForm()
+            }
 
             loadReminders()
         }
     }
+
+    // =========================================================
+    // ON / OFF
+    // =========================================================
+
+    private fun toggleReminder(
+        reminder: Reminder,
+        isEnabled: Boolean
+    ) {
+
+        if (isEnabled) {
+
+            if (!hasExactAlarmPermission()) {
+
+                loadReminders()
+
+                return
+            }
+
+            lifecycleScope.launch {
+
+                val updatedReminder =
+                    reminder.copy(
+                        isEnabled = true
+                    )
+
+                database.reminderDao()
+                    .updateReminder(
+                        updatedReminder
+                    )
+
+                ReminderScheduler.scheduleReminder(
+                    this@ReminderActivity,
+                    updatedReminder
+                )
+
+                runOnUiThread {
+
+                    Toast.makeText(
+                        this@ReminderActivity,
+                        "Alarm turned ON 🔔",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                loadReminders()
+            }
+
+        } else {
+
+            lifecycleScope.launch {
+
+                ReminderScheduler.cancelReminder(
+                    this@ReminderActivity,
+                    reminder
+                )
+
+                val updatedReminder =
+                    reminder.copy(
+                        isEnabled = false
+                    )
+
+                database.reminderDao()
+                    .updateReminder(
+                        updatedReminder
+                    )
+
+                runOnUiThread {
+
+                    Toast.makeText(
+                        this@ReminderActivity,
+                        "Alarm turned OFF 🔕",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                loadReminders()
+            }
+        }
+    }
+
+    // =========================================================
+    // EDIT REMINDER
+    // =========================================================
 
     private fun editReminder(
         reminder: Reminder
@@ -237,6 +456,8 @@ class ReminderActivity : AppCompatActivity() {
             reminder.message
         )
 
+        editText.setSingleLine(true)
+
         editText.setPadding(
             40,
             20,
@@ -245,15 +466,12 @@ class ReminderActivity : AppCompatActivity() {
         )
 
         AlertDialog.Builder(this)
-
             .setTitle(
                 "Edit Alarm Message"
             )
-
             .setView(
                 editText
             )
-
             .setPositiveButton(
                 "Next"
             ) { _, _ ->
@@ -263,9 +481,7 @@ class ReminderActivity : AppCompatActivity() {
                         .toString()
                         .trim()
 
-                if (
-                    newMessage.isEmpty()
-                ) {
+                if (newMessage.isEmpty()) {
 
                     Toast.makeText(
                         this,
@@ -281,14 +497,16 @@ class ReminderActivity : AppCompatActivity() {
                     newMessage
                 )
             }
-
             .setNegativeButton(
                 "Cancel",
                 null
             )
-
             .show()
     }
+
+    // =========================================================
+    // EDIT TIME
+    // =========================================================
 
     private fun showEditTimePicker(
         reminder: Reminder,
@@ -308,31 +526,35 @@ class ReminderActivity : AppCompatActivity() {
                 ?.toIntOrNull()
                 ?: 0
 
-        val timePickerDialog =
-            TimePickerDialog(
-                this,
-                { _, hour, minute ->
+        TimePickerDialog(
+            this,
 
-                    val newTime =
-                        String.format(
-                            "%02d:%02d",
-                            hour,
-                            minute
-                        )
+            { _, hour, minute ->
 
-                    updateReminder(
-                        reminder,
-                        newMessage,
-                        newTime
+                val newTime =
+                    String.format(
+                        "%02d:%02d",
+                        hour,
+                        minute
                     )
-                },
-                oldHour,
-                oldMinute,
-                false
-            )
 
-        timePickerDialog.show()
+                updateReminder(
+                    reminder,
+                    newMessage,
+                    newTime
+                )
+            },
+
+            oldHour,
+            oldMinute,
+            false
+
+        ).show()
     }
+
+    // =========================================================
+    // UPDATE REMINDER
+    // =========================================================
 
     private fun updateReminder(
         reminder: Reminder,
@@ -346,7 +568,6 @@ class ReminderActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
 
-            // Old alarm cancel
             ReminderScheduler.cancelReminder(
                 this@ReminderActivity,
                 reminder
@@ -364,73 +585,108 @@ class ReminderActivity : AppCompatActivity() {
                     updatedReminder
                 )
 
-            // New alarm schedule
             ReminderScheduler.scheduleReminder(
                 this@ReminderActivity,
                 updatedReminder
             )
 
-            Toast.makeText(
-                this@ReminderActivity,
-                "Alarm updated ⏰",
-                Toast.LENGTH_SHORT
-            ).show()
+            runOnUiThread {
+
+                Toast.makeText(
+                    this@ReminderActivity,
+                    "Alarm updated ⏰",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
             loadReminders()
         }
     }
+
+    // =========================================================
+    // DELETE REMINDER
+    // =========================================================
 
     private fun deleteReminder(
         reminder: Reminder
     ) {
 
         AlertDialog.Builder(this)
-
             .setTitle(
                 "Delete Alarm"
             )
-
             .setMessage(
                 "Delete this alarm?\n\n" +
                         "${formatTimeForDisplay(reminder.time)}\n" +
                         reminder.message
             )
-
             .setPositiveButton(
                 "Delete"
             ) { _, _ ->
 
                 lifecycleScope.launch {
 
-                    // Cancel scheduled alarm
                     ReminderScheduler.cancelReminder(
                         this@ReminderActivity,
                         reminder
                     )
 
-                    // Delete from database
                     database.reminderDao()
                         .deleteReminder(
                             reminder
                         )
 
-                    Toast.makeText(
-                        this@ReminderActivity,
-                        "Alarm deleted 🗑️",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+
+                        Toast.makeText(
+                            this@ReminderActivity,
+                            "Alarm deleted 🗑️",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
                     loadReminders()
                 }
             }
-
             .setNegativeButton(
                 "Cancel",
                 null
             )
-
             .show()
     }
+
+    // =========================================================
+    // STATUS
+    // =========================================================
+
+    private fun updateStatus(
+        textView: TextView,
+        isEnabled: Boolean
+    ) {
+
+        if (isEnabled) {
+
+            textView.text =
+                "Daily • Alarm ON"
+
+            textView.setTextColor(
+                0xFF3FA76A.toInt()
+            )
+
+        } else {
+
+            textView.text =
+                "Daily • Alarm OFF"
+
+            textView.setTextColor(
+                0xFF999999.toInt()
+            )
+        }
+    }
+
+    // =========================================================
+    // CLEAR FORM
+    // =========================================================
 
     private fun clearForm() {
 
@@ -442,6 +698,10 @@ class ReminderActivity : AppCompatActivity() {
         tvSelectedTime.text =
             "🕐 Selected Time: Not selected"
     }
+
+    // =========================================================
+    // EXACT ALARM PERMISSION
+    // =========================================================
 
     private fun hasExactAlarmPermission(): Boolean {
 
@@ -467,29 +727,27 @@ class ReminderActivity : AppCompatActivity() {
 
                 try {
 
-                    val intent =
+                    startActivity(
                         Intent(
                             Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
                             Uri.parse(
                                 "package:$packageName"
                             )
                         )
-
-                    startActivity(intent)
+                    )
 
                 } catch (
                     e: Exception
                 ) {
 
-                    val intent =
+                    startActivity(
                         Intent(
                             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                             Uri.parse(
                                 "package:$packageName"
                             )
                         )
-
-                    startActivity(intent)
+                    )
                 }
 
                 return false
@@ -498,6 +756,10 @@ class ReminderActivity : AppCompatActivity() {
 
         return true
     }
+
+    // =========================================================
+    // TIME FORMAT
+    // =========================================================
 
     private fun formatTimeForDisplay(
         time: String

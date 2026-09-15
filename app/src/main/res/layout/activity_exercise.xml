@@ -2,73 +2,344 @@
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F7F5FA">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="18dp">
 
-        <TextView
+        <!-- ============================= -->
+        <!-- HEADER -->
+        <!-- ============================= -->
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🏃 Exercise Tracker"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="25dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
 
-        <TextView
-            android:id="@+id/tvExercisePercentage"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏃  FITNESS &amp; MOVEMENT"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#7D6AA8"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Exercise Tracker"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#27213A"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Stay active, stay healthy 💪"
+                    android:textSize="13sp"
+                    android:textColor="#8A8493"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="🏃"
+                android:textSize="25sp"
+                android:background="#EDE6F9"/>
+
+        </LinearLayout>
+
+
+        <!-- ============================= -->
+        <!-- PROGRESS CARD -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📊 Today's Completion: 0%"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#6B4FA8">
 
-        <TextView
-            android:id="@+id/tvExerciseStatus"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="22dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TODAY'S PROGRESS"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#DCD1F0"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="7dp"/>
+
+                <TextView
+                    android:id="@+id/tvExercisePercentage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📊 Today's Completion: 0%"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Every completed workout counts 🔥"
+                    android:textSize="12sp"
+                    android:textColor="#E9DFFD"
+                    android:gravity="center"
+                    android:layout_marginTop="7dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- STATUS -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Complete your exercises to continue your streak."
-            android:textSize="16sp"
-            android:gravity="center"
-            android:layout_marginBottom="25dp"/>
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#EFE8FA">
 
-        <Button
+            <TextView
+                android:id="@+id/tvExerciseStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Complete your exercises to continue your streak."
+                android:textSize="14sp"
+                android:textColor="#5F5870"
+                android:gravity="center"
+                android:padding="15dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- ADD EXERCISE -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnAddExercise"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="+ Add Exercise"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp"/>
+            android:layout_height="58dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginBottom="10dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#6B4FA8">
 
-        <Button
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="➕"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Exercise"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- EXERCISE REMINDER -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnExerciseReminder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="⏰ Set Exercise Reminder"
-            android:textSize="18sp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_height="58dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginBottom="22dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#EFE8FA"
+            app:strokeWidth="1dp"
+            app:strokeColor="#DED3F0">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewExercises"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginBottom="20dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tvCaloriesBurned"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⏰"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exercise Reminder"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#5E4C98"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- TODAY'S EXERCISES -->
+        <!-- ============================= -->
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🔥 Calories Burned: 0 kcal"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Today's Exercises"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                android:textColor="#27213A"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Track your workouts and completion"
+                android:textSize="12sp"
+                android:textColor="#8A8493"
+                android:layout_marginTop="2dp"/>
+
+        </LinearLayout>
+
+
+        <!-- ============================= -->
+        <!-- EXERCISE LIST -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="520dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E9E2F2">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewExercises"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="true"
+                android:overScrollMode="always"
+                android:clipToPadding="false"
+                android:padding="6dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ============================= -->
+        <!-- CALORIES BURNED -->
+        <!-- ============================= -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E9E2F2">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔥  CALORIES BURNED"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#8A8493"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="7dp"/>
+
+                <TextView
+                    android:id="@+id/tvCaloriesBurned"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔥 Calories Burned: 0 kcal"
+                    android:textSize="21sp"
+                    android:textStyle="bold"
+                    android:textColor="#27213A"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Great job staying active today!"
+                    android:textSize="12sp"
+                    android:textColor="#8A8493"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

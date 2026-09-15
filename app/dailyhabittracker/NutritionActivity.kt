@@ -2,7 +2,7 @@ package com.example.dailyhabittracker
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,30 +22,71 @@ class NutritionActivity : AppCompatActivity() {
     private lateinit var tvFiber: TextView
     private lateinit var tvVitamins: TextView
     private lateinit var tvFoodLog: TextView
-    private lateinit var btnAddFood: Button
+
+    // New XML uses MaterialCardView
+    private lateinit var btnAddFood: View
 
     private lateinit var database: HabitDatabase
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_nutrition)
+        setContentView(
+            R.layout.activity_nutrition
+        )
 
-        tvCalorieGoal = findViewById(R.id.tvCalorieGoal)
-        tvCalories = findViewById(R.id.tvCalories)
-        tvProteinGoal = findViewById(R.id.tvProteinGoal)
-        tvProtein = findViewById(R.id.tvProtein)
-        tvProteinRemaining = findViewById(R.id.tvProteinRemaining)
-        tvCarbs = findViewById(R.id.tvCarbs)
-        tvFat = findViewById(R.id.tvFat)
-        tvFiber = findViewById(R.id.tvFiber)
-        tvVitamins = findViewById(R.id.tvVitamins)
-        tvFoodLog = findViewById(R.id.tvFoodLog)
-        btnAddFood = findViewById(R.id.btnAddFood)
+        // ==========================================
+        // FIND VIEWS
+        // ==========================================
 
-        database = HabitDatabase.getDatabase(this)
+        tvCalorieGoal =
+            findViewById(R.id.tvCalorieGoal)
+
+        tvCalories =
+            findViewById(R.id.tvCalories)
+
+        tvProteinGoal =
+            findViewById(R.id.tvProteinGoal)
+
+        tvProtein =
+            findViewById(R.id.tvProtein)
+
+        tvProteinRemaining =
+            findViewById(R.id.tvProteinRemaining)
+
+        tvCarbs =
+            findViewById(R.id.tvCarbs)
+
+        tvFat =
+            findViewById(R.id.tvFat)
+
+        tvFiber =
+            findViewById(R.id.tvFiber)
+
+        tvVitamins =
+            findViewById(R.id.tvVitamins)
+
+        tvFoodLog =
+            findViewById(R.id.tvFoodLog)
+
+        btnAddFood =
+            findViewById(R.id.btnAddFood)
+
+        // ==========================================
+        // DATABASE
+        // ==========================================
+
+        database =
+            HabitDatabase.getDatabase(this)
+
+        // ==========================================
+        // ADD FOOD
+        // ==========================================
 
         btnAddFood.setOnClickListener {
+
             startActivity(
                 Intent(
                     this,
@@ -54,26 +95,41 @@ class NutritionActivity : AppCompatActivity() {
             )
         }
 
+        // ==========================================
+        // LOAD NUTRITION
+        // ==========================================
+
         loadNutrition()
     }
 
     override fun onResume() {
         super.onResume()
+
         loadNutrition()
     }
+
+    // ==========================================
+    // LOAD NUTRITION DATA
+    // ==========================================
 
     private fun loadNutrition() {
 
         lifecycleScope.launch {
 
-            val today = LocalDate.now().toString()
+            val today =
+                LocalDate.now().toString()
 
-            // ---------------- PROFILE ----------------
+            // ==========================================
+            // PROFILE
+            // ==========================================
 
             val profile =
-                database.userProfileDao().getProfile()
+                database.userProfileDao()
+                    .getProfile()
 
-            // ---------------- FOOD NUTRITION ----------------
+            // ==========================================
+            // FOOD NUTRITION
+            // ==========================================
 
             val calories =
                 database.nutritionDao()
@@ -115,7 +171,9 @@ class NutritionActivity : AppCompatActivity() {
                 database.nutritionDao()
                     .getEntriesForDate(today)
 
-            // ---------------- EXERCISE CALORIES ----------------
+            // ==========================================
+            // EXERCISE CALORIES
+            // ==========================================
 
             val exercises =
                 database.exerciseDao()
@@ -123,51 +181,86 @@ class NutritionActivity : AppCompatActivity() {
 
             val exerciseCalories =
                 exercises
-                    .filter { it.isCompleted }
-                    .sumOf { it.caloriesBurned }
+                    .filter {
+                        it.isCompleted
+                    }
+                    .sumOf {
+                        it.caloriesBurned
+                    }
 
-            // ---------------- PROFILE EXISTS ----------------
+            // ==========================================
+            // PROFILE EXISTS
+            // ==========================================
 
             if (profile != null) {
 
-                // Base calorie requirement
+                // ------------------------------------------
+                // BASE CALORIE GOAL
+                // ------------------------------------------
+
                 val baseCalorieGoal =
-                    NutritionCalculator.calculateCalories(profile)
+                    NutritionCalculator
+                        .calculateCalories(profile)
 
-                // Add calories burned through completed exercise
+                // ------------------------------------------
+                // ADJUSTED CALORIE GOAL
+                // ------------------------------------------
+
                 val adjustedCalorieGoal =
-                    baseCalorieGoal + exerciseCalories
+                    baseCalorieGoal +
+                            exerciseCalories
 
-                // Protein goal
+                // ------------------------------------------
+                // PROTEIN GOAL
+                // ------------------------------------------
+
                 val proteinGoal =
-                    NutritionCalculator.calculateProtein(profile)
+                    NutritionCalculator
+                        .calculateProtein(profile)
 
                 val remainingProtein =
                     (proteinGoal - protein)
                         .coerceAtLeast(0.0)
 
-                // Remaining calories
+                // ------------------------------------------
+                // REMAINING CALORIES
+                // ------------------------------------------
+
                 val remainingCalories =
                     (adjustedCalorieGoal - calories)
                         .coerceAtLeast(0.0)
 
+                // ==========================================
+                // UPDATE UI
+                // ==========================================
+
                 runOnUiThread {
 
-                    // ---------------- CALORIES ----------------
+                    // ======================================
+                    // CALORIES
+                    // ======================================
 
                     tvCalorieGoal.text =
-                        "🔥 Daily Calorie Goal: ${adjustedCalorieGoal.toInt()} kcal\n" +
-                                "Base Goal: ${baseCalorieGoal.toInt()} kcal\n" +
-                                "🏃 Exercise Added: ${exerciseCalories.toInt()} kcal"
+                        "🔥 Daily Calorie Goal: " +
+                                "${adjustedCalorieGoal.toInt()} kcal\n" +
+                                "Base Goal: " +
+                                "${baseCalorieGoal.toInt()} kcal\n" +
+                                "🏃 Exercise Added: " +
+                                "${exerciseCalories.toInt()} kcal"
 
                     tvCalories.text =
-                        "🍎 Calories Consumed: ${calories.toInt()} kcal\n" +
-                                "📊 Calories Remaining: ${remainingCalories.toInt()} kcal"
+                        "🍎 Calories Consumed: " +
+                                "${calories.toInt()} kcal\n" +
+                                "📊 Calories Remaining: " +
+                                "${remainingCalories.toInt()} kcal"
 
-                    // ---------------- PROTEIN ----------------
+                    // ======================================
+                    // PROTEIN
+                    // ======================================
 
                     tvProteinGoal.text =
-                        "💪 Protein Goal: ${proteinGoal.toInt()} g"
+                        "💪 Protein Goal: " +
+                                "${proteinGoal.toInt()} g"
 
                     tvProtein.text =
                         "Protein Consumed: ${
@@ -192,7 +285,9 @@ class NutritionActivity : AppCompatActivity() {
                             } g"
                         }
 
-                    // ---------------- MACROS ----------------
+                    // ======================================
+                    // MACRONUTRIENTS
+                    // ======================================
 
                     tvCarbs.text =
                         "🍚 Carbohydrates: ${
@@ -218,7 +313,9 @@ class NutritionActivity : AppCompatActivity() {
                             )
                         } g"
 
-                    // ---------------- VITAMINS & MINERALS ----------------
+                    // ======================================
+                    // VITAMINS & MINERALS
+                    // ======================================
 
                     tvVitamins.text =
                         "🍊 Vitamin A: ${
@@ -249,12 +346,15 @@ class NutritionActivity : AppCompatActivity() {
                                     )
                                 } mg"
 
-                    // ---------------- FOOD LOG ----------------
+                    // ======================================
+                    // FOOD LOG
+                    // ======================================
 
                     if (foodEntries.isEmpty()) {
 
                         tvFoodLog.text =
-                            "🍽️ Food Log\nNo food added today."
+                            "🍽️ Food Log\n" +
+                                    "No food added today."
 
                     } else {
 
@@ -293,7 +393,9 @@ class NutritionActivity : AppCompatActivity() {
 
             } else {
 
-                // ---------------- NO PROFILE ----------------
+                // ==========================================
+                // NO PROFILE
+                // ==========================================
 
                 runOnUiThread {
 
@@ -328,7 +430,8 @@ class NutritionActivity : AppCompatActivity() {
                                 "🩸 Iron: 0 mg"
 
                     tvFoodLog.text =
-                        "🍽️ Food Log\nNo food added today."
+                        "🍽️ Food Log\n" +
+                                "No food added today."
 
                     Toast.makeText(
                         this@NutritionActivity,

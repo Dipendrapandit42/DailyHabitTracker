@@ -1,65 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_marginBottom="12dp">
+    android:layout_margin="6dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="1dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E9E2F2">
 
-    <!-- Habit Name + Three Dot Menu -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- TOP ROW -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/ivHabitImage"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:src="@drawable/habit_default"
+                android:scaleType="centerCrop"
+                android:contentDescription="Habit image"
+                android:layout_marginEnd="10dp"/>
+
+            <TextView
+                android:id="@+id/tvMore"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="⋮"
+                android:textSize="27sp"
+                android:textColor="#55505F"
+                android:gravity="center|end"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="More options"/>
+
+        </LinearLayout>
+
+
+        <!-- HABIT NAME -->
 
         <TextView
             android:id="@+id/tvHabitName"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Evening exercise"
-            android:textSize="20sp"
+            android:text="Exercise"
+            android:textSize="19sp"
             android:textStyle="bold"
-            android:paddingVertical="8dp"/>
+            android:textColor="#27213A"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="6dp"/>
+
+
+        <!-- STREAK -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#F2ECFA">
+
+            <TextView
+                android:id="@+id/tvHabitStreak"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔥 0 Day Streak"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#6B4FA8"
+                android:padding="11dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- STATUS -->
 
         <TextView
-            android:id="@+id/tvMore"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="⋮"
-            android:textSize="28sp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="More options"/>
+            android:id="@+id/tvHabitStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not Completed Today"
+            android:textSize="12sp"
+            android:textColor="#77717F"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginBottom="11dp"/>
+
+
+        <!-- COMPLETE BUTTON -->
+
+        <Button
+            android:id="@+id/btnComplete"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:text="✅  Complete"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#6B4FA8"/>
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvHabitStreak"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🔥 0"
-        android:textSize="17sp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"/>
-
-    <TextView
-        android:id="@+id/tvHabitStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Not Completed"
-        android:textSize="15sp"
-        android:layout_marginBottom="10dp"/>
-
-    <Button
-        android:id="@+id/btnComplete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Complete"/>
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

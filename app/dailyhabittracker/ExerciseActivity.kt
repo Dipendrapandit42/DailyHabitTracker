@@ -3,7 +3,7 @@ package com.example.dailyhabittracker
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -16,8 +16,10 @@ import java.time.LocalDate
 
 class ExerciseActivity : AppCompatActivity() {
 
-    private lateinit var btnAddExercise: Button
-    private lateinit var btnExerciseReminder: Button
+    // New XML uses MaterialCardView
+    private lateinit var btnAddExercise: View
+    private lateinit var btnExerciseReminder: View
+
     private lateinit var recyclerViewExercises: RecyclerView
     private lateinit var tvExercisePercentage: TextView
     private lateinit var tvExerciseStatus: TextView
@@ -26,35 +28,82 @@ class ExerciseActivity : AppCompatActivity() {
     private lateinit var exerciseAdapter: ExerciseAdapter
     private lateinit var database: HabitDatabase
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_exercise)
-
-        btnAddExercise = findViewById(R.id.btnAddExercise)
-        btnExerciseReminder = findViewById(R.id.btnExerciseReminder)
-        recyclerViewExercises = findViewById(R.id.recyclerViewExercises)
-        tvExercisePercentage = findViewById(R.id.tvExercisePercentage)
-        tvExerciseStatus = findViewById(R.id.tvExerciseStatus)
-        tvCaloriesBurned = findViewById(R.id.tvCaloriesBurned)
-
-        database = HabitDatabase.getDatabase(this)
-
-        exerciseAdapter = ExerciseAdapter(
-            emptyList(),
-
-            onCompleteClick = { exercise ->
-                completeExercise(exercise)
-            },
-
-            onEditClick = { exercise ->
-                editExercise(exercise)
-            },
-
-            onDeleteClick = { exercise ->
-                deleteExercise(exercise)
-            }
+        setContentView(
+            R.layout.activity_exercise
         )
+
+        // ==========================================
+        // FIND VIEWS
+        // ==========================================
+
+        btnAddExercise =
+            findViewById(
+                R.id.btnAddExercise
+            )
+
+        btnExerciseReminder =
+            findViewById(
+                R.id.btnExerciseReminder
+            )
+
+        recyclerViewExercises =
+            findViewById(
+                R.id.recyclerViewExercises
+            )
+
+        tvExercisePercentage =
+            findViewById(
+                R.id.tvExercisePercentage
+            )
+
+        tvExerciseStatus =
+            findViewById(
+                R.id.tvExerciseStatus
+            )
+
+        tvCaloriesBurned =
+            findViewById(
+                R.id.tvCaloriesBurned
+            )
+
+        // ==========================================
+        // DATABASE
+        // ==========================================
+
+        database =
+            HabitDatabase.getDatabase(this)
+
+        // ==========================================
+        // ADAPTER
+        // ==========================================
+
+        exerciseAdapter =
+            ExerciseAdapter(
+                emptyList(),
+
+                onCompleteClick = { exercise ->
+                    completeExercise(
+                        exercise
+                    )
+                },
+
+                onEditClick = { exercise ->
+                    editExercise(
+                        exercise
+                    )
+                },
+
+                onDeleteClick = { exercise ->
+                    deleteExercise(
+                        exercise
+                    )
+                }
+            )
 
         recyclerViewExercises.layoutManager =
             LinearLayoutManager(this)
@@ -62,7 +111,12 @@ class ExerciseActivity : AppCompatActivity() {
         recyclerViewExercises.adapter =
             exerciseAdapter
 
+        // ==========================================
+        // ADD EXERCISE
+        // ==========================================
+
         btnAddExercise.setOnClickListener {
+
             startActivity(
                 Intent(
                     this,
@@ -71,7 +125,12 @@ class ExerciseActivity : AppCompatActivity() {
             )
         }
 
+        // ==========================================
+        // EXERCISE REMINDER
+        // ==========================================
+
         btnExerciseReminder.setOnClickListener {
+
             startActivity(
                 Intent(
                     this,
@@ -80,13 +139,22 @@ class ExerciseActivity : AppCompatActivity() {
             )
         }
 
+        // ==========================================
+        // LOAD EXERCISES
+        // ==========================================
+
         loadExercises()
     }
 
     override fun onResume() {
         super.onResume()
+
         loadExercises()
     }
+
+    // ==========================================
+    // LOAD EXERCISES
+    // ==========================================
 
     private fun loadExercises() {
 
@@ -97,11 +165,19 @@ class ExerciseActivity : AppCompatActivity() {
 
             val exercises =
                 database.exerciseDao()
-                    .getExercisesForDate(today)
+                    .getExercisesForDate(
+                        today
+                    )
 
-            updateExerciseProgress(exercises)
+            updateExerciseProgress(
+                exercises
+            )
         }
     }
+
+    // ==========================================
+    // COMPLETE EXERCISE
+    // ==========================================
 
     private fun completeExercise(
         exercise: Exercise
@@ -115,31 +191,57 @@ class ExerciseActivity : AppCompatActivity() {
                 )
 
             database.exerciseDao()
-                .updateExercise(updatedExercise)
+                .updateExercise(
+                    updatedExercise
+                )
 
             loadExercises()
         }
     }
 
+    // ==========================================
+    // EDIT EXERCISE
+    // ==========================================
+
     private fun editExercise(
         exercise: Exercise
     ) {
 
-        val editText = EditText(this)
+        val editText =
+            EditText(this)
 
-        editText.setText(exercise.name)
-        editText.setPadding(40, 20, 40, 20)
+        editText.setText(
+            exercise.name
+        )
+
+        editText.setSingleLine(true)
+
+        editText.setPadding(
+            40,
+            20,
+            40,
+            20
+        )
 
         AlertDialog.Builder(this)
-            .setTitle("Edit Exercise")
-            .setView(editText)
-
-            .setPositiveButton("Save") { _, _ ->
+            .setTitle(
+                "Edit Exercise"
+            )
+            .setView(
+                editText
+            )
+            .setPositiveButton(
+                "Save"
+            ) { _, _ ->
 
                 val newName =
-                    editText.text.toString().trim()
+                    editText.text
+                        .toString()
+                        .trim()
 
-                if (newName.isEmpty()) {
+                if (
+                    newName.isEmpty()
+                ) {
 
                     Toast.makeText(
                         this,
@@ -157,39 +259,46 @@ class ExerciseActivity : AppCompatActivity() {
                             )
 
                         database.exerciseDao()
-                            .updateExercise(updatedExercise)
+                            .updateExercise(
+                                updatedExercise
+                            )
 
                         loadExercises()
                     }
                 }
             }
-
             .setNegativeButton(
                 "Cancel",
                 null
             )
-
             .show()
     }
+
+    // ==========================================
+    // DELETE EXERCISE
+    // ==========================================
 
     private fun deleteExercise(
         exercise: Exercise
     ) {
 
         AlertDialog.Builder(this)
-
-            .setTitle("Delete Exercise")
-
+            .setTitle(
+                "Delete Exercise"
+            )
             .setMessage(
                 "Are you sure you want to delete \"${exercise.name}\"?"
             )
-
-            .setPositiveButton("Delete") { _, _ ->
+            .setPositiveButton(
+                "Delete"
+            ) { _, _ ->
 
                 lifecycleScope.launch {
 
                     database.exerciseDao()
-                        .deleteExercise(exercise)
+                        .deleteExercise(
+                            exercise
+                        )
 
                     Toast.makeText(
                         this@ExerciseActivity,
@@ -200,14 +309,16 @@ class ExerciseActivity : AppCompatActivity() {
                     loadExercises()
                 }
             }
-
             .setNegativeButton(
                 "Cancel",
                 null
             )
-
             .show()
     }
+
+    // ==========================================
+    // UPDATE PROGRESS
+    // ==========================================
 
     private fun updateExerciseProgress(
         exercises: List<Exercise>
@@ -223,13 +334,20 @@ class ExerciseActivity : AppCompatActivity() {
 
         val percentage =
             if (totalExercises == 0) {
+
                 0.0
+
             } else {
+
                 (
                         completedExercises.toDouble()
                                 / totalExercises.toDouble()
                         ) * 100
             }
+
+        // ==========================================
+        // CALORIES BURNED
+        // ==========================================
 
         val caloriesBurned =
             exercises
@@ -239,6 +357,10 @@ class ExerciseActivity : AppCompatActivity() {
                 .sumOf {
                     it.caloriesBurned
                 }
+
+        // ==========================================
+        // UPDATE UI
+        // ==========================================
 
         runOnUiThread {
 
@@ -261,20 +383,21 @@ class ExerciseActivity : AppCompatActivity() {
 
             when {
 
+                // No exercises
                 totalExercises == 0 -> {
 
                     tvExerciseStatus.text =
                         "Add exercises for today."
-
                 }
 
+                // 75% or more
                 percentage >= 75.0 -> {
 
                     tvExerciseStatus.text =
                         "🎉 75%+ completed! Streak continues 🔥"
-
                 }
 
+                // Less than 75%
                 else -> {
 
                     tvExerciseStatus.text =

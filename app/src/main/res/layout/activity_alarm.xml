@@ -1,55 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="30dp"
-    android:background="#FFFFFF">
+    android:background="#120E1A">
 
-    <TextView
-        android:id="@+id/tvAlarmIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="⏰"
-        android:textSize="70sp"
-        android:layout_marginBottom="20dp"/>
+    <!-- Background Image -->
 
-    <TextView
-        android:id="@+id/tvAlarmTitle"
+    <ImageView
+        android:id="@+id/ivAlarmImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ALARM"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"/>
+        android:layout_height="match_parent"
+        android:src="@drawable/alarm1"
+        android:scaleType="centerCrop"
+        android:alpha="0.32"
+        android:contentDescription="Alarm background"/>
 
-    <TextView
-        android:id="@+id/tvAlarmMessage"
+
+    <!-- Dark overlay -->
+
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Exercise ka time ho gaya 🏃"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="40dp"/>
+        android:layout_height="match_parent"
+        android:background="#99000000"/>
 
-    <Button
-        android:id="@+id/btnSnoozeAlarm"
+
+    <!-- Main Content -->
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="😴 SNOOZE 5 MIN"
-        android:textSize="18sp"
-        android:layout_marginBottom="15dp"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <Button
-        android:id="@+id/btnStopAlarm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="🛑 STOP ALARM"
-        android:textSize="18sp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp">
 
-</LinearLayout>
+            <!-- Alarm Icon -->
+
+            <TextView
+                android:id="@+id/tvAlarmIcon"
+                android:layout_width="82dp"
+                android:layout_height="82dp"
+                android:gravity="center"
+                android:text="⏰"
+                android:textSize="43sp"
+                android:background="#806B4FA8"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="18dp"/>
+
+
+            <!-- Small Label -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DAILY REMINDER"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#DDD5EA"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="8dp"/>
+
+
+            <!-- Alarm Title -->
+
+            <TextView
+                android:id="@+id/tvAlarmTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ALARM"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:layout_marginBottom="14dp"/>
+
+
+            <!-- Alarm Message Card -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="28dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#DD201A27"
+                app:strokeWidth="1dp"
+                app:strokeColor="#67577A">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="22dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔔 REMINDER"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#CFC2E5"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="9dp"/>
+
+                    <TextView
+                        android:id="@+id/tvAlarmMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Exercise ka time ho gaya 🏃"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center"
+                        android:lineSpacingExtra="4dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Snooze -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnSnoozeAlarm"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#EDE6F9"
+                app:strokeWidth="1dp"
+                app:strokeColor="#D8CBEA">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="😴"
+                        android:textSize="21sp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SNOOZE 5 MIN"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#5E4C98"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Stop -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnStopAlarm"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#6B4FA8">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛑"
+                        android:textSize="20sp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STOP ALARM"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Bottom Hint -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your daily consistency starts with one small action."
+                android:textSize="12sp"
+                android:textColor="#C5BCCE"
+                android:gravity="center"
+                android:layout_marginTop="20dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

@@ -1,10 +1,14 @@
 package com.example.dailyhabittracker
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.widget.Button
+import android.provider.Settings
+import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -12,50 +16,146 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var btnAddHabit: Button
-    private lateinit var btnAlarm: Button
-    private lateinit var btnStatistics: Button
-    private lateinit var btnNutrition: Button
-    private lateinit var btnExercise: Button
-    private lateinit var btnProfile: Button
+    // =========================================
+    // QUICK ACTION CARDS
+    // =========================================
 
+    private lateinit var btnAddHabit: View
+    private lateinit var btnAlarm: View
+    private lateinit var btnStatistics: View
+    private lateinit var btnNutrition: View
+    private lateinit var btnExercise: View
+    private lateinit var btnProfile: View
+
+    // =========================================
+    // HOME VIEWS
+    // =========================================
+
+    private lateinit var tvGreeting: TextView
     private lateinit var tvStreak: TextView
+    private lateinit var tvProfileIcon: TextView
+    private lateinit var tvViewAllHabits: TextView
+
     private lateinit var recyclerViewHabits: RecyclerView
     private lateinit var habitAdapter: HabitAdapter
 
     private lateinit var database: HabitDatabase
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    // =========================================
+    // ON CREATE
+    // =========================================
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(
+            R.layout.activity_main
+        )
 
-        btnAddHabit = findViewById(R.id.btnAddHabit)
-        btnAlarm = findViewById(R.id.btnAlarm)
-        btnStatistics = findViewById(R.id.btnStatistics)
-        btnNutrition = findViewById(R.id.btnNutrition)
-        btnExercise = findViewById(R.id.btnExercise)
-        btnProfile = findViewById(R.id.btnProfile)
+        // =====================================
+        // FIND VIEWS
+        // =====================================
 
-        tvStreak = findViewById(R.id.tvStreak)
-        recyclerViewHabits = findViewById(R.id.recyclerViewHabits)
+        btnAddHabit =
+            findViewById(R.id.btnAddHabit)
 
-        database = HabitDatabase.getDatabase(this)
+        btnAlarm =
+            findViewById(R.id.btnAlarm)
 
-        // Schedule daily notifications at 5:00 AM and 5:00 PM
-        NotificationScheduler.scheduleNotifications(this)
+        btnStatistics =
+            findViewById(R.id.btnStatistics)
 
-        // Request notification permission for Android 13+
-        if (android.os.Build.VERSION.SDK_INT >=
-            android.os.Build.VERSION_CODES.TIRAMISU
+        btnNutrition =
+            findViewById(R.id.btnNutrition)
+
+        btnExercise =
+            findViewById(R.id.btnExercise)
+
+        btnProfile =
+            findViewById(R.id.btnProfile)
+
+        tvGreeting =
+            findViewById(R.id.tvGreeting)
+
+        tvStreak =
+            findViewById(R.id.tvStreak)
+
+        tvProfileIcon =
+            findViewById(R.id.tvProfileIcon)
+
+        tvViewAllHabits =
+            findViewById(R.id.tvViewAllHabits)
+
+        recyclerViewHabits =
+            findViewById(R.id.recyclerViewHabits)
+
+        // =====================================
+        // DATABASE
+        // =====================================
+
+        database =
+            HabitDatabase.getDatabase(this)
+
+        // =====================================
+        // EXACT ALARM PERMISSION
+        // =====================================
+
+        if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.S
+        ) {
+
+            val alarmManager =
+                getSystemService(
+                    Context.ALARM_SERVICE
+                ) as AlarmManager
+
+            if (
+                !alarmManager.canScheduleExactAlarms()
+            ) {
+
+                try {
+
+                    val intent =
+                        Intent(
+                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                        )
+
+                    startActivity(intent)
+
+                } catch (e: Exception) {
+
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        // =====================================
+        // DAILY NOTIFICATIONS
+        // =====================================
+
+        NotificationScheduler.scheduleNotifications(
+            this
+        )
+
+        // =====================================
+        // NOTIFICATION PERMISSION
+        // =====================================
+
+        if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.TIRAMISU
         ) {
 
             if (
@@ -74,30 +174,44 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Habit Adapter
-        habitAdapter = HabitAdapter(
-            emptyList(),
+        // =====================================
+        // HABIT ADAPTER
+        // =====================================
 
-            onCompleteClick = { habit ->
-                completeHabit(habit)
-            },
+        habitAdapter =
+            HabitAdapter(
+                emptyList(),
 
-            onEditClick = { habit ->
-                editHabit(habit)
-            },
+                onCompleteClick = { habit ->
+                    completeHabit(habit)
+                },
 
-            onDeleteClick = { habit ->
-                deleteHabit(habit)
-            }
-        )
+                onEditClick = { habit ->
+                    editHabit(habit)
+                },
+
+                onDeleteClick = { habit ->
+                    deleteHabit(habit)
+                }
+            )
+
+        // =====================================
+        // HABIT GRID
+        // =====================================
 
         recyclerViewHabits.layoutManager =
-            LinearLayoutManager(this)
+            GridLayoutManager(
+                this,
+                2
+            )
 
         recyclerViewHabits.adapter =
             habitAdapter
 
-        // Add Habit
+        // =====================================
+        // ADD HABIT
+        // =====================================
+
         btnAddHabit.setOnClickListener {
 
             startActivity(
@@ -108,7 +222,10 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Alarm
+        // =====================================
+        // ALARM
+        // =====================================
+
         btnAlarm.setOnClickListener {
 
             startActivity(
@@ -119,18 +236,10 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Statistics
-        btnStatistics.setOnClickListener {
+        // =====================================
+        // NUTRITION
+        // =====================================
 
-            startActivity(
-                Intent(
-                    this,
-                    StatisticsActivity::class.java
-                )
-            )
-        }
-
-        // Nutrition Tracker
         btnNutrition.setOnClickListener {
 
             startActivity(
@@ -141,7 +250,10 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Exercise Tracker
+        // =====================================
+        // EXERCISE
+        // =====================================
+
         btnExercise.setOnClickListener {
 
             startActivity(
@@ -152,7 +264,24 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Profile
+        // =====================================
+        // STATISTICS
+        // =====================================
+
+        btnStatistics.setOnClickListener {
+
+            startActivity(
+                Intent(
+                    this,
+                    StatisticsActivity::class.java
+                )
+            )
+        }
+
+        // =====================================
+        // PROFILE CARD
+        // =====================================
+
         btnProfile.setOnClickListener {
 
             startActivity(
@@ -163,14 +292,110 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // =====================================
+        // PROFILE ICON
+        // =====================================
+
+        tvProfileIcon.setOnClickListener {
+
+            startActivity(
+                Intent(
+                    this,
+                    ProfileActivity::class.java
+                )
+            )
+        }
+
+        // =====================================
+        // VIEW ALL HABITS ARROW
+        // =====================================
+
+        tvViewAllHabits.setOnClickListener {
+
+            startActivity(
+                Intent(
+                    this,
+                    AllHabitsActivity::class.java
+                )
+            )
+        }
+
+        // =====================================
+        // FIRST LOAD
+        // =====================================
+
+        updateGreeting()
         loadHabits()
     }
+
+    // =========================================
+    // ON RESUME
+    // =========================================
 
     override fun onResume() {
         super.onResume()
 
+        updateGreeting()
         loadHabits()
     }
+
+    // =========================================
+    // DYNAMIC GREETING
+    // =========================================
+
+    private fun updateGreeting() {
+
+        lifecycleScope.launch {
+
+            val profile =
+                database.userProfileDao()
+                    .getProfile()
+
+            val savedName =
+                profile?.name
+                    ?.trim()
+                    ?: ""
+
+            val name =
+                if (
+                    savedName.isNotEmpty()
+                ) {
+                    savedName
+                } else {
+                    "there"
+                }
+
+            val hour =
+                Calendar.getInstance()
+                    .get(Calendar.HOUR_OF_DAY)
+
+            val greeting =
+                when (hour) {
+
+                    in 5..11 ->
+                        "Good Morning ☀️"
+
+                    in 12..16 ->
+                        "Good Afternoon 🌤️"
+
+                    in 17..20 ->
+                        "Good Evening 🌇"
+
+                    else ->
+                        "Good Night 🌙"
+                }
+
+            runOnUiThread {
+
+                tvGreeting.text =
+                    "$greeting, $name"
+            }
+        }
+    }
+
+    // =========================================
+    // LOAD HABITS
+    // =========================================
 
     private fun loadHabits() {
 
@@ -186,7 +411,9 @@ class MainActivity : AppCompatActivity() {
             val updatedHabits =
                 habits.map { habit ->
 
-                    if (habit.lastCompletedDate != null) {
+                    if (
+                        habit.lastCompletedDate != null
+                    ) {
 
                         val lastDate =
                             LocalDate.parse(
@@ -203,12 +430,17 @@ class MainActivity : AppCompatActivity() {
                             if (
                                 daysSinceLastCompletion > 0
                             ) {
+
                                 daysSinceLastCompletion - 1
+
                             } else {
+
                                 0
                             }
 
-                        if (missedDays > 3) {
+                        if (
+                            missedDays > 3
+                        ) {
 
                             habit.copy(
                                 currentStreak = 0,
@@ -219,7 +451,9 @@ class MainActivity : AppCompatActivity() {
                         } else {
 
                             habit.copy(
-                                missedDays = missedDays,
+                                missedDays =
+                                    missedDays,
+
                                 isCompletedToday =
                                     habit.lastCompletedDate ==
                                             today.toString()
@@ -228,14 +462,22 @@ class MainActivity : AppCompatActivity() {
 
                     } else {
 
-                        habit
+                        habit.copy(
+                            isCompletedToday = false
+                        )
                     }
                 }
+
+            // =================================
+            // SAVE UPDATED HABIT STATUS
+            // =================================
 
             updatedHabits.forEach { habit ->
 
                 database.habitDao()
-                    .updateHabit(habit)
+                    .updateHabit(
+                        habit
+                    )
             }
 
             runOnUiThread {
@@ -244,10 +486,19 @@ class MainActivity : AppCompatActivity() {
                     updatedHabits
                 )
 
+                // =================================
+                // MAX STREAK
+                // =================================
+
                 val maxStreak =
-                    if (updatedHabits.isEmpty()) {
+                    if (
+                        updatedHabits.isEmpty()
+                    ) {
+
                         0
+
                     } else {
+
                         updatedHabits.maxOf {
                             it.currentStreak
                         }
@@ -258,6 +509,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // =========================================
+    // COMPLETE HABIT
+    // =========================================
 
     private fun completeHabit(
         habit: Habit
@@ -271,7 +526,9 @@ class MainActivity : AppCompatActivity() {
             var newStreak =
                 habit.currentStreak
 
-            if (habit.lastCompletedDate == null) {
+            if (
+                habit.lastCompletedDate == null
+            ) {
 
                 newStreak = 1
 
@@ -292,8 +549,11 @@ class MainActivity : AppCompatActivity() {
                     if (
                         daysSinceLastCompletion > 0
                     ) {
+
                         daysSinceLastCompletion - 1
+
                     } else {
+
                         0
                     }
 
@@ -323,9 +583,11 @@ class MainActivity : AppCompatActivity() {
                     lastCompletedDate =
                         today.toString(),
 
-                    missedDays = 0,
+                    missedDays =
+                        0,
 
-                    isCompletedToday = true
+                    isCompletedToday =
+                        true
                 )
 
             database.habitDao()
@@ -336,6 +598,10 @@ class MainActivity : AppCompatActivity() {
             loadHabits()
         }
     }
+
+    // =========================================
+    // EDIT HABIT
+    // =========================================
 
     private fun editHabit(
         habit: Habit
@@ -356,15 +622,12 @@ class MainActivity : AppCompatActivity() {
         )
 
         AlertDialog.Builder(this)
-
             .setTitle(
                 "Edit Habit"
             )
-
             .setView(
                 editText
             )
-
             .setPositiveButton(
                 "Save"
             ) { _, _ ->
@@ -402,29 +665,28 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
             .setNegativeButton(
                 "Cancel",
                 null
             )
-
             .show()
     }
+
+    // =========================================
+    // DELETE HABIT
+    // =========================================
 
     private fun deleteHabit(
         habit: Habit
     ) {
 
         AlertDialog.Builder(this)
-
             .setTitle(
                 "Delete Habit"
             )
-
             .setMessage(
                 "Are you sure you want to delete \"${habit.name}\"?"
             )
-
             .setPositiveButton(
                 "Delete"
             ) { _, _ ->
@@ -445,12 +707,10 @@ class MainActivity : AppCompatActivity() {
                     loadHabits()
                 }
             }
-
             .setNegativeButton(
                 "Cancel",
                 null
             )
-
             .show()
     }
 }

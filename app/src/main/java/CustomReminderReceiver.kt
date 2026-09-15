@@ -6,55 +6,76 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 
 class CustomReminderReceiver : BroadcastReceiver() {
+
+    companion object {
+        private const val CHANNEL_ID = "exercise_alarm_fullscreen_v2"
+        private const val CHANNEL_NAME = "Exercise Alarms"
+    }
 
     override fun onReceive(
         context: Context,
         intent: Intent
     ) {
+        // Acquire wake lock
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DailyHabitTracker:AlarmWakeLock")
+        wakeLock.acquire(10 * 1000L)
+
+        // -----------------------------------
+        // 1. Get alarm data
+        // -----------------------------------
 
         val reminderId =
             intent.getIntExtra(
                 "REMINDER_ID",
-                System.currentTimeMillis().toInt()
+                intent.getIntExtra(
+                    "ALARM_ID",
+                    System.currentTimeMillis().toInt()
+                )
             )
 
         val message =
-            intent.getStringExtra(
-                "REMINDER_MESSAGE"
-            ) ?: "Exercise ka time ho gaya 🏃"
+            intent.getStringExtra("REMINDER_MESSAGE")
+                ?: intent.getStringExtra("ALARM_MESSAGE")
+                ?: "Exercise ka time ho gaya 🏃"
 
         val reminderTime =
-            intent.getStringExtra(
-                "REMINDER_TIME"
-            )
+            intent.getStringExtra("REMINDER_TIME")
 
         // -----------------------------------
-        // 1. Open full-screen AlarmActivity
+        // 2. Full-screen AlarmActivity Intent
         // -----------------------------------
 
-        val alarmIntent = Intent(
-            context,
-            AlarmActivity::class.java
-        ).apply {
+        val alarmIntent =
+            Intent(
+                context,
+                AlarmActivity::class.java
+            ).apply {
 
-            putExtra(
-                "ALARM_ID",
-                reminderId
-            )
+                putExtra(
+                    "ALARM_ID",
+                    reminderId
+                )
 
-            putExtra(
-                "ALARM_MESSAGE",
-                message
-            )
+                putExtra(
+                    "ALARM_MESSAGE",
+                    message
+                )
 
-            addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP
-            )
-        }
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP
+                )
+            }
 
         val alarmPendingIntent =
             PendingIntent.getActivity(
@@ -66,31 +87,76 @@ class CustomReminderReceiver : BroadcastReceiver() {
             )
 
         // -----------------------------------
-        // 2. Notification Channel
+        // 3. Alarm sound
         // -----------------------------------
 
-        val channelId =
-            "alarm_reminders"
+        val resId =
+            context.resources.getIdentifier(
+                "alarm_ringtone",
+                "raw",
+                context.packageName
+            )
+
+        val alarmSoundUri: Uri =
+            if (resId != 0) {
+                Uri.parse(
+                    "android.resource://${context.packageName}/$resId"
+                )
+            } else {
+                RingtoneManager.getDefaultUri(
+                    RingtoneManager.TYPE_ALARM
+                )
+            }
+
+        val audioAttributes =
+            AudioAttributes.Builder()
+                .setUsage(
+                    AudioAttributes.USAGE_ALARM
+                )
+                .setContentType(
+                    AudioAttributes.CONTENT_TYPE_SONIFICATION
+                )
+                .build()
+
+        // -----------------------------------
+        // 4. Create HIGH importance channel
+        // -----------------------------------
 
         val notificationManager =
             context.getSystemService(
                 Context.NOTIFICATION_SERVICE
             ) as NotificationManager
 
-        if (
-            android.os.Build.VERSION.SDK_INT >=
-            android.os.Build.VERSION_CODES.O
-        ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             val channel =
                 NotificationChannel(
-                    channelId,
-                    "Exercise Alarm",
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH
-                )
+                ).apply {
 
-            channel.description =
-                "Exercise and custom alarm notifications"
+                    description =
+                        "Full-screen exercise and custom alarms"
+
+                    setSound(
+                        alarmSoundUri,
+                        audioAttributes
+                    )
+
+                    enableVibration(true)
+
+                    vibrationPattern =
+                        longArrayOf(
+                            0,
+                            700,
+                            400,
+                            700
+                        )
+
+                    lockscreenVisibility =
+                        NotificationCompat.VISIBILITY_PUBLIC
+                }
 
             notificationManager.createNotificationChannel(
                 channel
@@ -98,13 +164,13 @@ class CustomReminderReceiver : BroadcastReceiver() {
         }
 
         // -----------------------------------
-        // 3. Alarm notification
+        // 5. Build full-screen notification
         // -----------------------------------
 
         val notification =
             NotificationCompat.Builder(
                 context,
-                channelId
+                CHANNEL_ID
             )
                 .setSmallIcon(
                     android.R.drawable.ic_lock_idle_alarm
@@ -121,13 +187,27 @@ class CustomReminderReceiver : BroadcastReceiver() {
                 .setCategory(
                     NotificationCompat.CATEGORY_ALARM
                 )
-                .setAutoCancel(false)
+                .setVisibility(
+                    NotificationCompat.VISIBILITY_PUBLIC
+                )
+                .setSound(
+                    alarmSoundUri,
+                    android.media.AudioManager.STREAM_ALARM
+                )
                 .setOngoing(true)
+                .setAutoCancel(false)
+                .setContentIntent(
+                    alarmPendingIntent
+                )
                 .setFullScreenIntent(
                     alarmPendingIntent,
                     true
                 )
                 .build()
+
+        // -----------------------------------
+        // 6. Show notification
+        // -----------------------------------
 
         notificationManager.notify(
             reminderId,
@@ -135,7 +215,7 @@ class CustomReminderReceiver : BroadcastReceiver() {
         )
 
         // -----------------------------------
-        // 4. Schedule same alarm for tomorrow
+        // 7. Schedule tomorrow's alarm
         // -----------------------------------
 
         if (

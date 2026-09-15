@@ -14,8 +14,9 @@ class ExerciseAdapter(
     private val onDeleteClick: (Exercise) -> Unit
 ) : RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder>() {
 
-    class ExerciseViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    class ExerciseViewHolder(
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView) {
 
         val tvExerciseName: TextView =
             itemView.findViewById(R.id.tvExerciseName)
@@ -41,8 +42,13 @@ class ExerciseAdapter(
         viewType: Int
     ): ExerciseViewHolder {
 
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_exercise, parent, false)
+        val view =
+            LayoutInflater.from(parent.context)
+                .inflate(
+                    R.layout.item_exercise,
+                    parent,
+                    false
+                )
 
         return ExerciseViewHolder(view)
     }
@@ -52,7 +58,12 @@ class ExerciseAdapter(
         position: Int
     ) {
 
-        val exercise = exercises[position]
+        val exercise =
+            exercises[position]
+
+        // ==========================================
+        // EXERCISE INFORMATION
+        // ==========================================
 
         holder.tvExerciseName.text =
             "🏃 ${exercise.name}"
@@ -63,6 +74,10 @@ class ExerciseAdapter(
         holder.tvExerciseCalories.text =
             "🔥 ${exercise.caloriesBurned.toInt()} kcal"
 
+        // ==========================================
+        // COMPLETE BUTTON
+        // ==========================================
+
         if (exercise.isCompleted) {
 
             holder.btnCompleteExercise.text =
@@ -70,6 +85,10 @@ class ExerciseAdapter(
 
             holder.btnCompleteExercise.isEnabled =
                 false
+
+            holder.btnCompleteExercise.setOnClickListener(
+                null
+            )
 
         } else {
 
@@ -80,26 +99,56 @@ class ExerciseAdapter(
                 true
 
             holder.btnCompleteExercise.setOnClickListener {
-                onCompleteClick(exercise)
+
+                onCompleteClick(
+                    exercise
+                )
             }
         }
 
+        // ==========================================
+        // EDIT
+        // ==========================================
+
         holder.btnEditExercise.setOnClickListener {
-            onEditClick(exercise)
+
+            onEditClick(
+                exercise
+            )
         }
 
+        // ==========================================
+        // DELETE
+        // ==========================================
+
         holder.btnDeleteExercise.setOnClickListener {
-            onDeleteClick(exercise)
+
+            onDeleteClick(
+                exercise
+            )
         }
     }
 
-    override fun getItemCount(): Int =
-        exercises.size
+    // ==========================================
+    // ITEM COUNT
+    // ==========================================
+
+    override fun getItemCount(): Int {
+
+        return exercises.size
+    }
+
+    // ==========================================
+    // UPDATE LIST
+    // ==========================================
 
     fun updateExercises(
         newExercises: List<Exercise>
     ) {
-        exercises = newExercises
+
+        exercises =
+            newExercises.toList()
+
         notifyDataSetChanged()
     }
 }

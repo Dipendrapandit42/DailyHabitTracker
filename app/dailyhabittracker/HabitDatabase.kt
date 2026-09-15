@@ -16,7 +16,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         Exercise::class,
         Reminder::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class HabitDatabase : RoomDatabase() {
@@ -33,8 +33,15 @@ abstract class HabitDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: HabitDatabase? = null
 
+        // -----------------------------------------
+        // Migration 1 -> 2
+        // -----------------------------------------
+
         private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+
+            override fun migrate(
+                database: SupportSQLiteDatabase
+            ) {
 
                 database.execSQL(
                     "ALTER TABLE habits ADD COLUMN dailyTarget REAL NOT NULL DEFAULT 0.0"
@@ -89,8 +96,15 @@ abstract class HabitDatabase : RoomDatabase() {
             }
         }
 
+        // -----------------------------------------
+        // Migration 2 -> 3
+        // -----------------------------------------
+
         private val MIGRATION_2_3 = object : Migration(2, 3) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+
+            override fun migrate(
+                database: SupportSQLiteDatabase
+            ) {
 
                 database.execSQL(
                     """
@@ -109,8 +123,15 @@ abstract class HabitDatabase : RoomDatabase() {
             }
         }
 
+        // -----------------------------------------
+        // Migration 3 -> 4
+        // -----------------------------------------
+
         private val MIGRATION_3_4 = object : Migration(3, 4) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+
+            override fun migrate(
+                database: SupportSQLiteDatabase
+            ) {
 
                 database.execSQL(
                     """
@@ -127,8 +148,15 @@ abstract class HabitDatabase : RoomDatabase() {
             }
         }
 
+        // -----------------------------------------
+        // Migration 4 -> 5
+        // -----------------------------------------
+
         private val MIGRATION_4_5 = object : Migration(4, 5) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+
+            override fun migrate(
+                database: SupportSQLiteDatabase
+            ) {
 
                 database.execSQL(
                     """
@@ -143,22 +171,50 @@ abstract class HabitDatabase : RoomDatabase() {
             }
         }
 
-        fun getDatabase(context: Context): HabitDatabase {
+        // -----------------------------------------
+        // Migration 5 -> 6
+        // Add name to user_profile
+        // -----------------------------------------
+
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+
+            override fun migrate(
+                database: SupportSQLiteDatabase
+            ) {
+
+                database.execSQL(
+                    """
+                    ALTER TABLE user_profile
+                    ADD COLUMN name TEXT NOT NULL DEFAULT ''
+                    """.trimIndent()
+                )
+            }
+        }
+
+        // -----------------------------------------
+        // Get Database
+        // -----------------------------------------
+
+        fun getDatabase(
+            context: Context
+        ): HabitDatabase {
 
             return INSTANCE ?: synchronized(this) {
 
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    HabitDatabase::class.java,
-                    "habit_database"
-                )
-                    .addMigrations(
-                        MIGRATION_1_2,
-                        MIGRATION_2_3,
-                        MIGRATION_3_4,
-                        MIGRATION_4_5
+                val instance =
+                    Room.databaseBuilder(
+                        context.applicationContext,
+                        HabitDatabase::class.java,
+                        "habit_database"
                     )
-                    .build()
+                        .addMigrations(
+                            MIGRATION_1_2,
+                            MIGRATION_2_3,
+                            MIGRATION_3_4,
+                            MIGRATION_4_5,
+                            MIGRATION_5_6
+                        )
+                        .build()
 
                 INSTANCE = instance
 
