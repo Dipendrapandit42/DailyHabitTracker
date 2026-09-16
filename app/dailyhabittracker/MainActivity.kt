@@ -442,6 +442,8 @@ class MainActivity : AppCompatActivity() {
                             missedDays > 3
                         ) {
 
+                            // More than 3 missed days
+                            // → streak resets to 0
                             habit.copy(
                                 currentStreak = 0,
                                 missedDays = missedDays,
@@ -450,6 +452,8 @@ class MainActivity : AppCompatActivity() {
 
                         } else {
 
+                            // 0 to 3 missed days
+                            // → keep existing streak
                             habit.copy(
                                 missedDays =
                                     missedDays,
@@ -523,8 +527,11 @@ class MainActivity : AppCompatActivity() {
             val today =
                 LocalDate.now()
 
-            var newStreak =
-                habit.currentStreak
+            val newStreak: Int
+
+            // =================================
+            // FIRST COMPLETION
+            // =================================
 
             if (
                 habit.lastCompletedDate == null
@@ -545,34 +552,46 @@ class MainActivity : AppCompatActivity() {
                         today
                     ).toInt()
 
-                val missedDays =
-                    if (
-                        daysSinceLastCompletion > 0
-                    ) {
-
-                        daysSinceLastCompletion - 1
-
-                    } else {
-
-                        0
-                    }
+                // =================================
+                // STREAK LOGIC
+                // =================================
 
                 newStreak =
                     when {
 
-                        daysSinceLastCompletion == 0 ->
+                        // Same day:
+                        // Do not increase again
+                        daysSinceLastCompletion == 0 -> {
                             habit.currentStreak
+                        }
 
-                        missedDays in 1..3 ->
+                        // Completed on next day:
+                        // 1 → 2 → 3 → 4
+                        daysSinceLastCompletion == 1 -> {
                             habit.currentStreak + 1
+                        }
 
-                        missedDays > 3 ->
+                        // Missed 1 to 3 days:
+                        // Keep streak alive and continue
+                        daysSinceLastCompletion in 2..4 -> {
+                            habit.currentStreak + 1
+                        }
+
+                        // Missed more than 3 days:
+                        // Reset and start again
+                        daysSinceLastCompletion > 4 -> {
                             1
+                        }
 
-                        else ->
+                        else -> {
                             habit.currentStreak
+                        }
                     }
             }
+
+            // =================================
+            // UPDATE HABIT
+            // =================================
 
             val updatedHabit =
                 habit.copy(

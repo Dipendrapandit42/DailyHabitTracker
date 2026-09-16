@@ -28,51 +28,37 @@ class SplashActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.viewPager)
         btnGetStarted = findViewById(R.id.btnGetStarted)
 
-        // Set all three splash images
         viewPager.adapter = SplashPagerAdapter(images)
 
-        // Start from first screen
         viewPager.setCurrentItem(0, false)
 
-        // Button click system
         btnGetStarted.setOnClickListener {
 
             when (viewPager.currentItem) {
 
-                // 1st screen: Get Started
                 0 -> {
                     viewPager.setCurrentItem(1, true)
                 }
 
-                // 2nd screen: Next
                 1 -> {
                     viewPager.setCurrentItem(2, true)
                 }
 
-                // 3rd screen: Let's Go
                 2 -> {
-                    openMainActivity()
+                    startActivity(
+                        Intent(
+                            this,
+                            MainActivity::class.java
+                        )
+                    )
+
+                    finish()
                 }
             }
         }
     }
-
-    private fun openMainActivity() {
-
-        val intent = Intent(
-            this,
-            MainActivity::class.java
-        )
-
-        startActivity(intent)
-
-        finish()
-    }
 }
 
-/**
- * Adapter for splash/onboarding images.
- */
 class SplashPagerAdapter(
     private val images: List<Int>
 ) : RecyclerView.Adapter<SplashPagerAdapter.SplashViewHolder>() {
@@ -84,12 +70,14 @@ class SplashPagerAdapter(
 
         val imageView = ImageView(parent.context)
 
-        imageView.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
+        imageView.layoutParams =
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
 
-        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageView.scaleType =
+            ImageView.ScaleType.CENTER_CROP
 
         return SplashViewHolder(imageView)
     }
@@ -98,7 +86,9 @@ class SplashPagerAdapter(
         holder: SplashViewHolder,
         position: Int
     ) {
-        holder.imageView.setImageResource(images[position])
+        holder.imageView.setImageResource(
+            images[position]
+        )
     }
 
     override fun getItemCount(): Int {

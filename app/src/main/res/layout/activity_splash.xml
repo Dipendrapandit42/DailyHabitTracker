@@ -4,19 +4,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3EFF8">
+    android:background="#F3EFF8"
+    android:fitsSystemWindows="false">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Large transparent click area over the bottom button area -->
+    <!-- Only the button area is clickable -->
     <View
         android:id="@+id/btnGetStarted"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_gravity="bottom"
+        android:layout_width="280dp"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="88dp"
         android:background="@android:color/transparent"
         android:clickable="true"
         android:focusable="true"

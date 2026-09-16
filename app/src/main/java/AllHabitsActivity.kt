@@ -18,43 +18,73 @@ class AllHabitsActivity : AppCompatActivity() {
     private lateinit var recyclerViewAllHabits: RecyclerView
     private lateinit var tvBackAllHabits: TextView
     private lateinit var tvHabitCount: TextView
-    private lateinit var cardEmptyHabits: com.google.android.material.card.MaterialCardView
+    private lateinit var cardEmptyHabits:
+            com.google.android.material.card.MaterialCardView
 
     private lateinit var habitAdapter: HabitAdapter
     private lateinit var database: HabitDatabase
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_all_habits)
 
-        tvBackAllHabits = findViewById(R.id.tvBackAllHabits)
-        tvHabitCount = findViewById(R.id.tvHabitCount)
-        recyclerViewAllHabits = findViewById(R.id.recyclerViewAllHabits)
-        cardEmptyHabits = findViewById(R.id.cardEmptyHabits)
-
-        database = HabitDatabase.getDatabase(this)
-
-        habitAdapter = HabitAdapter(
-            emptyList(),
-
-            // COMPLETE
-            onCompleteClick = { habit ->
-                completeHabit(habit)
-            },
-
-            // EDIT
-            onEditClick = { habit ->
-                showEditDialog(habit)
-            },
-
-            // DELETE
-            onDeleteClick = { habit ->
-                showDeleteDialog(habit)
-            }
+        setContentView(
+            R.layout.activity_all_habits
         )
 
-        recyclerViewAllHabits.layoutManager = GridLayoutManager(this, 2)
-        recyclerViewAllHabits.adapter = habitAdapter
+        tvBackAllHabits =
+            findViewById(R.id.tvBackAllHabits)
+
+        tvHabitCount =
+            findViewById(R.id.tvHabitCount)
+
+        recyclerViewAllHabits =
+            findViewById(R.id.recyclerViewAllHabits)
+
+        cardEmptyHabits =
+            findViewById(R.id.cardEmptyHabits)
+
+        database =
+            HabitDatabase.getDatabase(this)
+
+        // =====================================
+        // HABIT ADAPTER
+        // =====================================
+
+        habitAdapter =
+            HabitAdapter(
+                emptyList(),
+
+                onCompleteClick = { habit ->
+                    completeHabit(habit)
+                },
+
+                onEditClick = { habit ->
+                    showEditDialog(habit)
+                },
+
+                onDeleteClick = { habit ->
+                    showDeleteDialog(habit)
+                }
+            )
+
+        // =====================================
+        // GRID
+        // =====================================
+
+        recyclerViewAllHabits.layoutManager =
+            GridLayoutManager(
+                this,
+                2
+            )
+
+        recyclerViewAllHabits.adapter =
+            habitAdapter
+
+        // =====================================
+        // BACK
+        // =====================================
 
         tvBackAllHabits.setOnClickListener {
             finish()
@@ -63,163 +93,260 @@ class AllHabitsActivity : AppCompatActivity() {
         loadHabits()
     }
 
+    // =========================================
+    // ON RESUME
+    // =========================================
+
     override fun onResume() {
         super.onResume()
+
         loadHabits()
     }
 
-    // =========================
+    // =========================================
     // LOAD ALL HABITS
-    // =========================
+    // =========================================
+
     private fun loadHabits() {
 
         lifecycleScope.launch {
 
-            val habits = database.habitDao().getAllHabits()
-            val today = LocalDate.now()
+            val habits =
+                database.habitDao()
+                    .getAllHabits()
 
-            val updatedHabits = habits.map { habit ->
+            val today =
+                LocalDate.now()
 
-                if (habit.lastCompletedDate != null) {
+            val updatedHabits =
+                habits.map { habit ->
 
-                    val lastDate = LocalDate.parse(habit.lastCompletedDate)
+                    if (
+                        habit.lastCompletedDate != null
+                    ) {
 
-                    val daysSinceLastCompletion =
-                        ChronoUnit.DAYS.between(lastDate, today).toInt()
+                        val lastDate =
+                            LocalDate.parse(
+                                habit.lastCompletedDate
+                            )
 
-                    val missedDays =
-                        if (daysSinceLastCompletion > 0) {
-                            daysSinceLastCompletion - 1
+                        val daysSinceLastCompletion =
+                            ChronoUnit.DAYS.between(
+                                lastDate,
+                                today
+                            ).toInt()
+
+                        val missedDays =
+                            if (
+                                daysSinceLastCompletion > 0
+                            ) {
+                                daysSinceLastCompletion - 1
+                            } else {
+                                0
+                            }
+
+                        if (
+                            missedDays > 3
+                        ) {
+
+                            // More than 3 missed days
+                            // → reset streak to 0
+                            habit.copy(
+                                currentStreak = 0,
+                                missedDays = missedDays,
+                                isCompletedToday = false
+                            )
+
                         } else {
-                            0
+
+                            // Keep current streak
+                            habit.copy(
+                                missedDays = missedDays,
+                                isCompletedToday =
+                                    habit.lastCompletedDate ==
+                                            today.toString()
+                            )
                         }
-
-                    if (missedDays > 3) {
-
-                        habit.copy(
-                            currentStreak = 0,
-                            missedDays = missedDays,
-                            isCompletedToday = false
-                        )
 
                     } else {
 
                         habit.copy(
-                            missedDays = missedDays,
-                            isCompletedToday =
-                                habit.lastCompletedDate == today.toString()
+                            isCompletedToday = false
                         )
                     }
-
-                } else {
-
-                    habit.copy(
-                        isCompletedToday = false
-                    )
                 }
-            }
+
+            // =====================================
+            // SAVE STATUS
+            // =====================================
 
             updatedHabits.forEach { habit ->
-                database.habitDao().updateHabit(habit)
+
+                database.habitDao()
+                    .updateHabit(habit)
             }
 
             runOnUiThread {
 
-                habitAdapter.updateHabits(updatedHabits)
+                habitAdapter.updateHabits(
+                    updatedHabits
+                )
 
-                tvHabitCount.text = updatedHabits.size.toString()
+                tvHabitCount.text =
+                    updatedHabits.size.toString()
 
-                if (updatedHabits.isEmpty()) {
+                // =================================
+                // EMPTY STATE
+                // =================================
 
-                    recyclerViewAllHabits.visibility = View.GONE
-                    cardEmptyHabits.visibility = View.VISIBLE
+                if (
+                    updatedHabits.isEmpty()
+                ) {
+
+                    recyclerViewAllHabits.visibility =
+                        View.GONE
+
+                    cardEmptyHabits.visibility =
+                        View.VISIBLE
 
                 } else {
 
-                    recyclerViewAllHabits.visibility = View.VISIBLE
-                    cardEmptyHabits.visibility = View.GONE
+                    recyclerViewAllHabits.visibility =
+                        View.VISIBLE
+
+                    cardEmptyHabits.visibility =
+                        View.GONE
                 }
             }
         }
     }
 
-    // =========================
+    // =========================================
     // COMPLETE HABIT
-    // =========================
-    private fun completeHabit(habit: Habit) {
+    // =========================================
+
+    private fun completeHabit(
+        habit: Habit
+    ) {
 
         lifecycleScope.launch {
 
-            val today = LocalDate.now()
+            val today =
+                LocalDate.now()
 
-            var newStreak = habit.currentStreak
+            val newStreak: Int
 
-            if (habit.lastCompletedDate == null) {
+            // =================================
+            // FIRST COMPLETION
+            // =================================
+
+            if (
+                habit.lastCompletedDate == null
+            ) {
 
                 newStreak = 1
 
             } else {
 
-                val lastDate = LocalDate.parse(habit.lastCompletedDate)
+                val lastDate =
+                    LocalDate.parse(
+                        habit.lastCompletedDate
+                    )
 
                 val daysSinceLastCompletion =
-                    ChronoUnit.DAYS.between(lastDate, today).toInt()
+                    ChronoUnit.DAYS.between(
+                        lastDate,
+                        today
+                    ).toInt()
 
-                val missedDays =
-                    if (daysSinceLastCompletion > 0) {
-                        daysSinceLastCompletion - 1
-                    } else {
-                        0
+                // =================================
+                // STREAK RULES
+                // =================================
+
+                newStreak =
+                    when {
+
+                        // Already completed today
+                        daysSinceLastCompletion == 0 -> {
+                            habit.currentStreak
+                        }
+
+                        // Completed on next day
+                        daysSinceLastCompletion == 1 -> {
+                            habit.currentStreak + 1
+                        }
+
+                        // Missed 1–3 days
+                        // Streak continues
+                        daysSinceLastCompletion in 2..4 -> {
+                            habit.currentStreak + 1
+                        }
+
+                        // Missed more than 3 days
+                        // Start new streak
+                        daysSinceLastCompletion > 4 -> {
+                            1
+                        }
+
+                        else -> {
+                            habit.currentStreak
+                        }
                     }
-
-                newStreak = when {
-
-                    // Already completed today
-                    daysSinceLastCompletion == 0 ->
-                        habit.currentStreak
-
-                    // Missed 1-3 days
-                    missedDays in 1..3 ->
-                        habit.currentStreak + 1
-
-                    // Missed more than 3 days
-                    missedDays > 3 ->
-                        1
-
-                    else ->
-                        habit.currentStreak
-                }
             }
 
-            val updatedHabit = habit.copy(
+            // =================================
+            // UPDATE HABIT
+            // =================================
 
-                currentStreak = newStreak,
+            val updatedHabit =
+                habit.copy(
 
-                lastCompletedDate = today.toString(),
+                    currentStreak =
+                        newStreak,
 
-                missedDays = 0,
+                    lastCompletedDate =
+                        today.toString(),
 
-                isCompletedToday = true
-            )
+                    missedDays =
+                        0,
 
-            database.habitDao().updateHabit(updatedHabit)
+                    isCompletedToday =
+                        true
+                )
+
+            database.habitDao()
+                .updateHabit(
+                    updatedHabit
+                )
 
             loadHabits()
         }
     }
 
-    // =========================
+    // =========================================
     // EDIT HABIT
-    // =========================
-    private fun showEditDialog(habit: Habit) {
+    // =========================================
 
-        val editText = EditText(this)
+    private fun showEditDialog(
+        habit: Habit
+    ) {
 
-        editText.setText(habit.name)
+        val editText =
+            EditText(this)
 
-        editText.setSelection(editText.text.length)
+        editText.setText(
+            habit.name
+        )
 
-        val padding = (20 * resources.displayMetrics.density).toInt()
+        editText.setSelection(
+            editText.text.length
+        )
+
+        val padding =
+            (
+                    20 *
+                            resources.displayMetrics.density
+                    ).toInt()
 
         editText.setPadding(
             padding,
@@ -228,33 +355,58 @@ class AllHabitsActivity : AppCompatActivity() {
             padding
         )
 
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Edit Habit")
-            .setMessage("Change your habit name")
-            .setView(editText)
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Save", null)
-            .create()
+        val dialog =
+            AlertDialog.Builder(this)
+                .setTitle(
+                    "Edit Habit"
+                )
+                .setMessage(
+                    "Change your habit name"
+                )
+                .setView(
+                    editText
+                )
+                .setNegativeButton(
+                    "Cancel",
+                    null
+                )
+                .setPositiveButton(
+                    "Save",
+                    null
+                )
+                .create()
 
         dialog.setOnShowListener {
 
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            dialog.getButton(
+                AlertDialog.BUTTON_POSITIVE
+            ).setOnClickListener {
 
-                val newName = editText.text.toString().trim()
+                val newName =
+                    editText.text
+                        .toString()
+                        .trim()
 
-                if (newName.isEmpty()) {
+                if (
+                    newName.isEmpty()
+                ) {
 
-                    editText.error = "Please enter habit name"
+                    editText.error =
+                        "Please enter habit name"
 
                 } else {
 
                     lifecycleScope.launch {
 
-                        val updatedHabit = habit.copy(
-                            name = newName
-                        )
+                        val updatedHabit =
+                            habit.copy(
+                                name = newName
+                            )
 
-                        database.habitDao().updateHabit(updatedHabit)
+                        database.habitDao()
+                            .updateHabit(
+                                updatedHabit
+                            )
 
                         dialog.dismiss()
 
@@ -267,22 +419,35 @@ class AllHabitsActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    // =========================
+    // =========================================
     // DELETE HABIT
-    // =========================
-    private fun showDeleteDialog(habit: Habit) {
+    // =========================================
+
+    private fun showDeleteDialog(
+        habit: Habit
+    ) {
 
         AlertDialog.Builder(this)
-            .setTitle("Delete Habit")
+            .setTitle(
+                "Delete Habit"
+            )
             .setMessage(
                 "Are you sure you want to delete \"${habit.name}\"?"
             )
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Delete") { _, _ ->
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
+            .setPositiveButton(
+                "Delete"
+            ) { _, _ ->
 
                 lifecycleScope.launch {
 
-                    database.habitDao().deleteHabit(habit)
+                    database.habitDao()
+                        .deleteHabit(
+                            habit
+                        )
 
                     loadHabits()
                 }
